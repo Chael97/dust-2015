@@ -1,1 +1,0 @@
-/Library/Frameworks/R.framework/Resources/bin/exec/R --slave --vanilla --args -i data/sourcetracker_16S_uparse/merged_ger_hmp_L6_manual_nospaces.txt -m data/sourcetracker_16S_uparse/ger_microbialsource_mappingfile_simplified_151013.txt -o results/sourcetracker_out/
