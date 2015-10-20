@@ -1,0 +1,87 @@
+Num samples: 72
+Num observations: 706
+Total count: 1691379
+Table density (fraction of non-zero values): 0.309
+
+Counts/sample summary:
+ Min: 4.0
+ Max: 37732.0
+ Median: 25189.500
+ Mean: 23491.375
+ Std. dev.: 7523.601
+ Sample Metadata Categories: None provided
+ Observation Metadata Categories: None provided
+
+Counts/sample detail:
+ oneuL3031: 4.0
+ oneuLP1: 18.0
+ oneuLFT6: 21.0
+ oneuLP2: 23.0
+ oneuLC1: 396.0
+ oneuLP6: 13325.0
+ oneuLFT2: 15676.0
+ oneuL304b1: 16600.0
+ oneuLC4: 18547.0
+ oneuL2202: 19868.0
+ oneuL1252: 20419.0
+ oneuLC2: 20600.0
+ oneuLFT4: 20929.0
+ oneuLP5: 21090.0
+ oneuL1402.2: 21259.0
+ oneuL131a1: 21418.0
+ oneuL120e1: 21487.0
+ oneuL2181: 21883.0
+ oneuL3041: 22213.0
+ oneuLcontroL1: 22237.0
+ oneuLP4: 22665.0
+ oneuL2422: 22893.0
+ oneuL2191: 23008.0
+ oneuL3181: 23033.0
+ oneuL120a1.2: 23188.0
+ oneuL3301.2: 23341.0
+ oneuL1404.2: 23395.0
+ oneuLb401: 23948.0
+ oneuL3441: 23973.0
+ oneuL330a1: 23976.0
+ oneuLC3: 24189.0
+ oneuL125a1.2: 24567.0
+ oneuL3081: 24613.0
+ oneuLs2101: 24824.0
+ oneuL2421: 24941.0
+ oneuL120a2.2: 25130.0
+ oneuLH2412.2: 25249.0
+ oneuL1201: 25386.0
+ oneuLh2411: 25394.0
+ oneuL2192: 25413.0
+ oneuL1202: 25460.0
+ oneuLFT1: 25527.0
+ oneuL3301: 25747.0
+ oneuL3461: 26048.0
+ oneuL1403: 26068.0
+ oneuLFT5: 26116.0
+ oneuLs2301: 26347.0
+ oneuLcontroL2: 26430.0
+ oneuLs2101.2: 26460.0
+ oneuLP3: 26961.0
+ oneuLC6: 27151.0
+ oneuL120a1: 27487.0
+ oneuL308a1: 27525.0
+ oneuL2461: 27528.0
+ oneuL3462: 27656.0
+ oneuL2201: 27714.0
+ oneuL1404: 27853.0
+ oneuL125c1: 28087.0
+ oneuL1401: 28096.0
+ oneuL120a2: 28101.0
+ oneuL1402: 28483.0
+ oneuL3082: 28525.0
+ oneuL1251: 28836.0
+ oneuLh2412: 28841.0
+ oneuL125a1: 29890.0
+ oneuLC5: 30108.0
+ oneuL3182: 30148.0
+ oneuLs2401: 30525.0
+ oneuLFT3: 30827.0
+ oneuL2451: 33630.0
+ oneuL2431: 34333.0
+ oneuL304a1: 37732.0

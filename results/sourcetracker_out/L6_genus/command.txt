@@ -1,1 +1,1 @@
-/Library/Frameworks/R.framework/Resources/bin/exec/R --slave --vanilla --args -i data/sourcetracker_16S_uparse/merged_ger_hmp_L6_manual_nospaces.txt -m data/sourcetracker_16S_uparse/ger_sourcetracker_map_151013.txt -o results/sourcetracker_out/
+/Library/Frameworks/R.framework/Resources/bin/exec/R --slave --vanilla --args -i data/sourcetracker_16S_uparse/ger_sourcetracker_merged/merged_ger_hmp_L6_manual_nospaces.txt -m data/sourcetracker_16S_uparse/ger_sourcetracker_map_151013.txt -o results/sourcetracker_out/L6_genus/
