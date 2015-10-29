@@ -37,7 +37,10 @@ sort(rowSums(cont.otu), decreasing = TRUE)[1:10]
 ## and chloroplasts (13,439 reads), followed by Halomonadaceae (6,754 reads). 
 ## thereafter the read counts are below 2,000, or approximately 10% of each sample;
 ## control1 has 22,237 reads and control2 has 26,430 reads.
-cont.exclude <- names(sort(rowSums(cont.otu), decreasing = TRUE))[1:3]
+cont.exclude <- names(sort(rowSums(cont.otu), decreasing = TRUE))[1:3] # remove by order
+cont.exclude <- rownames(cont.otu)[c(grep('chloroplast', rownames(cont.otu), ignore.case = TRUE),
+                                     grep('mitochondria', rownames(cont.otu), ignore.case = TRUE),
+                                     grep('halomonadaceae', rownames(cont.otu), ignore.case = TRUE))] # remove by name
 
 ## save original OTU table
 otu.g.orig <- otu.g
@@ -49,8 +52,8 @@ otu.g <- otu.g.orig[!(rownames(otu.g.orig) %in% cont.exclude),]
 ## first look at read counts across samples
 summary(colSums(otu.g))
 
-## rarefy to the minimum count of 6,494
-otu.g.rare <- rrarefy(t(otu.g), 6494)
+## rarefy to the minimum count of 6,452
+otu.g.rare <- rrarefy(t(otu.g), 6452)
 
 ## transpose original OTU table to put samples in rows, OTUs in columns
 otu.g <- t(otu.g)
