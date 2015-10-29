@@ -52,11 +52,13 @@ df.pcoa.bc.g.all <- merge(df.pcoa.bc.g, ger.map)
 
 ## all samples by space type
 gg.pcoa.bc.g <- ggplot(df.pcoa.bc.g.all, aes(x = PCoA1, y = PCoA2, color = SpaceTypeBioBE))
-gg.pcoa.bc.g + geom_point(size = 3) + scale_color_manual(values = brewer.pal(length(unique(df.pcoa.bc.g.all$SpaceTypeBioBE)), 'Paired'))
+gg.pcoa.bc.g + geom_point(size = 2) +
+  geom_text(aes(y = PCoA2 + 0.01, label = Description), size = 2, vjust = 0) + 
+  scale_color_manual(values = brewer.pal(length(unique(df.pcoa.bc.g.all$SpaceTypeBioBE)), 'Paired'))
 ggsave('figures/pcoa_bc_g_sampletype.png')
 
-## crack area
-gg.pcoa.bc.g <- ggplot(df.pcoa.bc.g.all, aes(x = PCoA1, y = PCoA2, color = SpaceTypeBioBE, size = CrackArea))
+## crack area NSF
+gg.pcoa.bc.g <- ggplot(df.pcoa.bc.g.all, aes(x = PCoA1, y = PCoA2, color = SpaceTypeBioBE, size = CrackAreaNSF))
 gg.pcoa.bc.g + geom_point() + scale_color_manual(values = brewer.pal(length(unique(df.pcoa.bc.g.all$SpaceTypeBioBE)), 'Paired'))
 ggsave('figures/pcoa_bc_g_crackarea.png')
 
@@ -99,12 +101,13 @@ df.pcoa.can.g.all <- merge(df.pcoa.can.g, ger.map)
 
 ## all samples by space type
 gg.pcoa.can.g <- ggplot(df.pcoa.can.g.all, aes(x = PCoA1, y = PCoA2, color = SpaceTypeBioBE))
-gg.pcoa.can.g + geom_point(size = 3) + 
+gg.pcoa.can.g + geom_point(size = 2) +
+  geom_text(aes(y = PCoA2 + 0.01, label = Description), size = 2, vjust = 0) + 
   scale_color_manual(values = brewer.pal(length(unique(df.pcoa.can.g.all$SpaceTypeBioBE)), 'Paired'))
 ggsave('figures/pcoa_can_g_sampletype.png')
 
-## crack area  
-gg.pcoa.can.g <- ggplot(df.pcoa.can.g.all, aes(x = PCoA1, y = PCoA2, color = SpaceTypeBioBE, size = CrackArea))
+## crack area NSF
+gg.pcoa.can.g <- ggplot(df.pcoa.can.g.all, aes(x = PCoA1, y = PCoA2, color = SpaceTypeBioBE, size = CrackAreaNSF))
 gg.pcoa.can.g + geom_point() + scale_color_manual(values = brewer.pal(length(unique(df.pcoa.can.g.all$SpaceTypeBioBE)), 'Paired'))
 ggsave('figures/pcoa_can_g_crackarea.png')
 
