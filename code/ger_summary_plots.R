@@ -48,6 +48,9 @@ df.pcoa.bc.g.all <- merge(df.pcoa.bc.g, ger.map)
 mycol.12 <- c('#A6CEE3', '#1F78B4', '#B2DF8A', '#33A02C', '#FB9A99', '#E31A1C', 
               '#FDBF6F', '#FF7F00', '#CAB2D6', '#6A3D9A', '#EEEE00', '#B15928')
 
+## set theme_bw
+theme_set(theme_bw())
+
 ## all samples by space type
 gg.pcoa.bc.g <- ggplot(df.pcoa.bc.g.all, aes(x = PCoA1, y = PCoA2, color = SpaceTypeBioBE))
 gg.pcoa.bc.g + geom_point(size = 2) +
