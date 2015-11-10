@@ -1,0 +1,1 @@
+/Library/Frameworks/R.framework/Resources/bin/exec/R --slave --vanilla --args -i data/sourcetracker/merge_all_datasets/151109_merged_ger_filtered_2samples_wood_barberan_hmp_L6_manual_final_edit.txt -m data/sourcetracker/merge_mapping_files/151109_ger_barberan_wood_hmp_merged_sourcetracker_map_subsample50.txt -o results/sourcetracker_out/ger_wood_barberan_genus_subsample50/

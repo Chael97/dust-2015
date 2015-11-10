@@ -1,0 +1,1 @@
+/Library/Frameworks/R.framework/Resources/bin/exec/R --slave --vanilla --args -i data/sourcetracker/merge_hmp_ger_16S_uparse/merged_ger_hmp_L6_manual_nospaces_filtered_2samples.txt -m data/sourcetracker/merge_mapping_files/151013_ger_sourcetracker_map.txt results/sourcetracker_out/test/
