@@ -1,0 +1,137 @@
+---
+title: "Comparison of QIIME, UPARSE and shotgun profiling of Gerlinger samples"
+author: "Roxana Hickey"
+date: "September 25, 2015"
+output: html_document
+---
+
+The goal of this analysis is to compare Erica's Gerlinger (dust) data processed by QIIME (16S rRNA), UPARSE (16S rRNA) and MetaPhlAn (shotgun metagenomes) and determine whether they give different profiles of community composition.
+
+## Setup
+```{r setup}
+library(vegan)
+setwd("~/Documents/gerlinger/")
+
+# read in master sample ID key
+sample.key <- read.table("data/sampleid_master_key.txt", header = T, sep = "\t")
+
+# exclude the "5 µL" samples (poor sample quality)
+sample.key.red <- sample.key[grep("05uL", sample.key$master_sampleid, invert = TRUE),]
+
+# taxonomic levels key
+tax.key <- data.frame(level = c("phylum", "class", "order", "family", "genus"),
+                      label = c("L2" ,"L3", "L4", "L5", "L6"))
+```
+
+# Comparison of classified 16S rRNA OTUs called by QIIME vs. UPARSE pipelines
+
+## Step 1A. Input QIIME-processed data
+```{r input-qiime}
+# read in QIIME-16S taxon tables
+files.qiime <- c("data/16S_qiime_otu_taxonomy/otu_table_merged_meta_L2.txt",
+                 "data/16S_qiime_otu_taxonomy/otu_table_merged_meta_L3.txt",
+                 "data/16S_qiime_otu_taxonomy/otu_table_merged_meta_L4.txt",
+                 "data/16S_qiime_otu_taxonomy/otu_table_merged_meta_L5.txt",
+                 "data/16S_qiime_otu_taxonomy/otu_table_merged_meta_L6.txt")
+
+qiime.tax <- lapply(files.qiime, function(x) read.table(x, header=TRUE, sep="\t", row.names=1))
+
+names(qiime.tax) <- c("phylum", "class", "order", "family", "genus")
+
+# rename columns with master sample IDs
+qiime.tax <- lapply(seq_along(qiime.tax), function(x){
+  colnames(qiime.tax[[x]]) <- sample.key$master_sampleid[match(colnames(qiime.tax[[x]]),
+                                                               sample.key$qiime_sampleid)]
+  qiime.tax[[x]]})
+
+names(qiime.tax) <- c("phylum", "class", "order", "family", "genus")
+
+# reduce dataset to exclude "5 µL" samples
+qiime.tax.red <- lapply(seq_along(qiime.tax), function(x){
+  pick <- colnames(qiime.tax[[x]])[colnames(qiime.tax[[x]]) %in% sample.key.red$master_sampleid]
+  qiime.tax[[x]][,pick]})
+
+names(qiime.tax.red) <- c("phylum", "class", "order", "family", "genus")
+```
+
+## Step 1B. Input UPARSE-processed data
+```{r input-uparse}
+# read in UPARSE-16S taxon tables
+files.uparse <- c("data/16S_uparse_otu_taxonomy/fiveuL1201_demuxed_tax_normalized_otus_merged_meta_L2.txt",
+                  "data/16S_uparse_otu_taxonomy/fiveuL1201_demuxed_tax_normalized_otus_merged_meta_L3.txt",
+                  "data/16S_uparse_otu_taxonomy/fiveuL1201_demuxed_tax_normalized_otus_merged_meta_L4.txt",
+                  "data/16S_uparse_otu_taxonomy/fiveuL1201_demuxed_tax_normalized_otus_merged_meta_L5.txt",
+                  "data/16S_uparse_otu_taxonomy/fiveuL1201_demuxed_tax_normalized_otus_merged_meta_L6.txt")
+
+uparse.tax <- lapply(files.uparse, function(x) read.table(x, header=TRUE, sep="\t", row.names=1))
+
+names(uparse.tax) <- c("phylum", "class", "order", "family", "genus")
+
+# rename columns with master sample IDs
+uparse.tax <- lapply(seq_along(uparse.tax), function(x){
+  colnames(uparse.tax[[x]]) <- sample.key$master_sampleid[match(colnames(uparse.tax[[x]]),
+                                                               sample.key$uparse_sampleid)]
+  uparse.tax[[x]]})
+
+names(uparse.tax) <- c("phylum", "class", "order", "family", "genus")
+
+# reduce dataset to exclude "5 µL" samples
+uparse.tax.red <- lapply(seq_along(uparse.tax), function(x){
+  pick <- colnames(uparse.tax[[x]])[colnames(uparse.tax[[x]]) %in% sample.key.red$master_sampleid]
+  uparse.tax[[x]][,pick]})
+
+names(uparse.tax.red) <- c("phylum", "class", "order", "family", "genus")
+```
+
+## Step 2. Find matching sample IDs and taxa names
+```{r match-qiime-uparse}
+# determine which sample IDs overlap between the two datasets (we can do this at one level)
+overlap.16S.id <- colnames(uparse.tax.red$phylum)[colnames(uparse.tax.red$phylum) %in% colnames(qiime.tax.red$phylum)]
+
+# determine which taxa overlap between the two datasets (do this for each level)
+overlap.16S.tax <- lapply(seq_along(uparse.tax.red), function(x){
+  rownames(uparse.tax.red[[x]])[rownames(uparse.tax.red[[x]]) %in% rownames(qiime.tax.red[[x]])]})
+
+# reduce datasets for comparison (+ transpose so samples are in rows)
+qiime.compare <- lapply(seq_along(qiime.tax.red), function(x){
+  dat <- as.data.frame(t(qiime.tax.red[[x]][overlap.16S.tax[[x]], overlap.16S.id]))
+  # dat$Other <- 1-rowSums(dat) ## uncomment this line to group excluded taxa as "Other"
+  dat})
+
+uparse.compare <- lapply(seq_along(uparse.tax.red), function(x){
+  dat <- as.data.frame(t(uparse.tax.red[[x]][overlap.16S.tax[[x]], overlap.16S.id]))
+  # dat$Other <- 1-rowSums(dat) ## uncomment this line to group excluded taxa as "Other"
+  dat})
+```
+
+## Step 3. Compute NMDS and perform Procrustes rotation to compare datasets
+```{r nmds}
+# NMDS
+qiime.compare.mds <- lapply(qiime.compare, metaMDS)
+uparse.compare.mds <- lapply(uparse.compare, metaMDS)
+```
+
+```{r procrustes, echo = F}
+# plot procrustes rotations (UPARSE rotated relative to QIIME)
+# pdf("results/procrustes_nmds_uparse_to_qiime.pdf", width = 8, height = 6, pointsize = 8)
+par(mfrow=c(2,3))
+lapply(seq_along(qiime.compare.mds), function(x){
+  plot(procrustes(qiime.compare.mds[[x]], uparse.compare.mds[[x]]), 
+       xlab = "NMDS1", ylab = "NMDS2",
+       ar.col=c("purple","blue","green","orange","red")[x],
+       main = paste("Procrustes rotation \n(", tax.key$level[x], " level)", sep=""))})
+# dev.off()
+
+# plot procrustes rotations (UPARSE rotated relative to QIIME), all plots on same axis scales
+# pdf("results/procrustes_nmds_uparse_to_qiime_monoscale.pdf", width = 8, height = 6, pointsize = 8)
+par(mfrow=c(2,3))
+lapply(seq_along(qiime.compare.mds), function(x){
+  plot(procrustes(qiime.compare.mds[[x]], uparse.compare.mds[[x]]), 
+       xlab = "NMDS1", ylab = "NMDS2",
+       ar.col=c("purple","blue","green","orange","red")[x],
+       xlim = c(-3,1), ylim = c(-2,2),
+       main = paste("Procrustes rotation \n(", tax.key$level[x], " level)", sep=""))})
+# dev.off()
+```
+
+## Compare metagenome composition to 16S from UPARSE

@@ -1,0 +1,1 @@
+/Library/Frameworks/R.framework/Resources/bin/exec/R --slave --vanilla --args -i data/sourcetracker/gerlinger_only/gerlinger_uparse_merged_L6_filtered_2samples_rm_extra_samples_rm_plant_mito_halo.txt -m data/sourcetracker/merge_mapping_files/151104_sourcetracker_map_ger_only.txt -o results/sourcetracker_out/ger_only_genus/
