@@ -2,7 +2,7 @@
 ## 2015-10-27
 ## Roxana Hickey <roxana.hickey@gmail.com>
 
-setwd('~/Documents/gerlinger/')
+setwd('~/Documents/projects/gerlinger/')
 library(vegan)
 
 ## read in the genus-level OTU table
@@ -53,7 +53,7 @@ otu.g <- otu.g.orig[!(rownames(otu.g.orig) %in% cont.exclude),]
 summary(colSums(otu.g))
 
 ## rarefy to the minimum count of 6,452
-otu.g.rare <- rrarefy(t(otu.g), 6452)
+otu.g.rare <- rrarefy(t(otu.g), 6400)
 
 ## transpose original OTU table to put samples in rows, OTUs in columns
 otu.g <- t(otu.g)
