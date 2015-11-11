@@ -15,34 +15,38 @@ library(gplots)
 # source('code/custom_ggplot_settings.R')
 # source('code/custom_heatmap.3.R')
 
-## load OTU table and map file from setup
-load('results/otu_setup/ger_otu_setup.RData')
+## load OTU table and map file from post-contaminant filtering
+# load('results/otu_setup/ger_otu_setup.RData')
+load('results/otu_setup/ger_rm_contaminants.RData')
 
+## Helpful reminders: 
+## ger.nc.6500 is the rarefied dataset with contaminants removed, controls retained. samples are in rows.
+## taxo.nc and consensus.nc are the taxonomic labels and short names for the rarefied dataset (ger.nc.6500)
+## bc.nc is the Bray-curtis dissimilarity matrix based on ger.nc.6500
+## pcoa.bc.nc is the corresponding PCoA object to bc.nc
+
+####################################
 ## heatmap
-## write dataframe with shorter taxa names
-df.taxa <- data.frame(full = colnames(otu.g.prop),
-                      short = '')
+## make proportion table
+ger.nc.prop <- prop.table(ger.nc, margin = 1)
 
-## subset to top 50 taxa
-pick <- order(colSums(otu.g.prop), decreasing=TRUE)[1:50]
-heatmap(otu.g.prop[, pick], trace = NULL)
+## subset to top 25 taxa
+pick <- order(apply(ger.nc.prop, 2, median), decreasing=TRUE)[1:15]
 
-####################################
-## compute Bray-Curtis and Canberra distances on rarefied data
-bc.g <- vegdist(otu.g.rare)
-can.g <- vegdist(otu.g.rare, 'canberra')
-
-####################################
-## PCoA
-pcoa.bc.g <- cmdscale(t(bc.g), eig = TRUE)
-pcoa.can.g <- cmdscale(t(can.g), eig = TRUE)
+png('figures/ger_heatmap_top15_genus.png', width = 6, height = 6, res = 300, units = 'in', pointsize = 8)
+heatmap.2(ger.nc.prop[,pick], scale = 'none', trace = 'none',
+          col = brewer.pal(9, 'YlGnBu'), margin = c(10,10), 
+          keysize = 1, density.info = 'none', key.title = '', key.xlab = 'Proportion',
+          labRow = ger.map[row.names(ger.nc.prop), 'SpaceType'],
+          labCol = consensus.nc[colnames(ger.nc.prop[,pick])])
+dev.off()
 
 ####################################
-## plot Bray-Curtis pcoa with ggplot
-df.pcoa.bc.g <- as.data.frame(pcoa.bc.g$points)
-colnames(df.pcoa.bc.g) <- c('PCoA1', 'PCoA2')
-df.pcoa.bc.g$Description <- rownames(df.pcoa.bc.g)
-df.pcoa.bc.g.all <- merge(df.pcoa.bc.g, ger.map)
+## plot Bray-Curtis PCoA
+df.pcoa.bc.nc <- as.data.frame(pcoa.bc.nc$points)
+colnames(df.pcoa.bc.nc) <- c('PCoA1', 'PCoA2')
+df.pcoa.bc.nc$SampleID <- rownames(df.pcoa.bc.nc)
+df.pcoa.bc.nc.all <- merge(df.pcoa.bc.nc, ger.map)
 
 ## specify 12 colors for space types
 mycol.12 <- c('#A6CEE3', '#1F78B4', '#B2DF8A', '#33A02C', '#FB9A99', '#E31A1C', 
@@ -52,176 +56,103 @@ mycol.12 <- c('#A6CEE3', '#1F78B4', '#B2DF8A', '#33A02C', '#FB9A99', '#E31A1C',
 theme_set(theme_bw())
 
 ## all samples by space type
-gg.pcoa.bc.g <- ggplot(df.pcoa.bc.g.all, aes(x = PCoA1, y = PCoA2, color = SpaceTypeBioBE))
-gg.pcoa.bc.g + geom_point(size = 3) +
+gg.pcoa.bc.nc <- ggplot(df.pcoa.bc.nc.all, aes(x = PCoA1, y = PCoA2, color = SpaceTypeBioBE))
+gg.pcoa.bc.nc + geom_point(size = 3) +
+  # ggtitle('PCoA on Bray-Curtis') +
   geom_text(aes(y = PCoA2 + 0.01, label = Description), size = 3, vjust = 0) + 
   scale_color_manual(values = mycol.12)
-ggsave('figures/pcoa_bc_g_sampletype.png')
+ggsave('figures/pcoa_bc_g_sampletype.png', width = 8, height = 6.5, units = 'in')
 
-## crack area NSF
-gg.pcoa.bc.g <- ggplot(df.pcoa.bc.g.all, aes(x = PCoA1, y = PCoA2, color = SpaceTypeBioBE, size = CrackAreaNSF))
-gg.pcoa.bc.g +   
-  geom_point(data = df.pcoa.bc.g.all[df.pcoa.bc.g.all$CrackNSFAvail == FALSE,], 
-             aes(x = PCoA1, y = PCoA2), 
-             size = 2, pch = 1, na.rm = FALSE) +
-  geom_point() + 
-  scale_size_continuous(range = c(3,8)) +
-  scale_color_manual(values = mycol.12)
-ggsave('figures/pcoa_bc_g_crackarea.png')
-
-## chem = TCSavg  
-gg.pcoa.bc.g <- ggplot(df.pcoa.bc.g.all, aes(x = PCoA1, y = PCoA2, color = SpaceTypeBioBE, size = TCSavg))
-gg.pcoa.bc.g + 
-  geom_point(data = df.pcoa.bc.g.all[df.pcoa.bc.g.all$ChemAvail == FALSE,], 
-             aes(x = PCoA1, y = PCoA2), 
-             size = 2, pch = 1) +
-  geom_point() + 
-  scale_color_manual(values = mycol.12) + 
-  scale_size_continuous(range = c(3,8))
-ggsave('figures/pcoa_bc_g_TCSavg.png')
-
-## chem = TCCavg  
-gg.pcoa.bc.g <- ggplot(df.pcoa.bc.g.all, aes(x = PCoA1, y = PCoA2, color = SpaceTypeBioBE, size = TCCavg))
-gg.pcoa.bc.g + 
-  geom_point(data = df.pcoa.bc.g.all[df.pcoa.bc.g.all$ChemAvail == FALSE,], 
-             aes(x = PCoA1, y = PCoA2), 
-             size = 2, pch = 1) +
-  geom_point() + 
-  scale_color_manual(values = mycol.12) + 
-  scale_size_continuous(range = c(3,8))
-ggsave('figures/pcoa_bc_g_TCCavg.png')
-
-## chem = MePBavg  
-gg.pcoa.bc.g <- ggplot(df.pcoa.bc.g.all, aes(x = PCoA1, y = PCoA2, color = SpaceTypeBioBE, size = MePBavg))
-gg.pcoa.bc.g + 
-  geom_point(data = df.pcoa.bc.g.all[df.pcoa.bc.g.all$ChemAvail == FALSE,], 
-             aes(x = PCoA1, y = PCoA2), 
-             size = 2, pch = 1) +
-  geom_point() + 
-  scale_color_manual(values = mycol.12) + 
-  scale_size_continuous(range = c(3,8))
-ggsave('figures/pcoa_bc_g_MePBavg.png')
-
-## chem = EtPBavg  
-gg.pcoa.bc.g <- ggplot(df.pcoa.bc.g.all, aes(x = PCoA1, y = PCoA2, color = SpaceTypeBioBE, size = EtPBavg))
-gg.pcoa.bc.g + 
-  geom_point(data = df.pcoa.bc.g.all[df.pcoa.bc.g.all$ChemAvail == FALSE,], 
-             aes(x = PCoA1, y = PCoA2), 
-             size = 2, pch = 1) +
-  geom_point() + 
-  scale_color_manual(values = mycol.12) + 
-  scale_size_continuous(range = c(3,8))
-ggsave('figures/pcoa_bc_g_EtPBavg.png')
-
-## chem = PrPBavg  
-gg.pcoa.bc.g <- ggplot(df.pcoa.bc.g.all, aes(x = PCoA1, y = PCoA2, color = SpaceTypeBioBE, size = PrPBavg))
-gg.pcoa.bc.g + 
-  geom_point(data = df.pcoa.bc.g.all[df.pcoa.bc.g.all$ChemAvail == FALSE,], 
-             aes(x = PCoA1, y = PCoA2), 
-             size = 2, pch = 1) +
-  geom_point() + 
-  scale_color_manual(values = mycol.12) + 
-  scale_size_continuous(range = c(3,8))
-ggsave('figures/pcoa_bc_g_PrPBavg.png')
-
-## chem = BuBPavg  
-gg.pcoa.bc.g <- ggplot(df.pcoa.bc.g.all, aes(x = PCoA1, y = PCoA2, color = SpaceTypeBioBE, size = BuPBavg))
-gg.pcoa.bc.g + 
-  geom_point(data = df.pcoa.bc.g.all[df.pcoa.bc.g.all$ChemAvail == FALSE,], 
-             aes(x = PCoA1, y = PCoA2), 
-             size = 2, pch = 1) +
-  geom_point() + 
-  scale_color_manual(values = mycol.12) + 
-  scale_size_continuous(range = c(3,8))
-ggsave('figures/pcoa_bc_g_BuPBavg.png')
-
-#################################
-## plot Canberra pcoa with ggplot
-df.pcoa.can.g <- as.data.frame(pcoa.can.g$points)
-colnames(df.pcoa.can.g) <- c('PCoA1', 'PCoA2')
-df.pcoa.can.g$Description <- rownames(df.pcoa.can.g)
-df.pcoa.can.g.all <- merge(df.pcoa.can.g, ger.map)
+####################################
+## plot Bray-Curtis NMDS
+df.nmds.bc.nc <- as.data.frame(nmds.bc.nc$points)
+colnames(df.nmds.bc.nc) <- c('NMDS1', 'NMDS2')
+df.nmds.bc.nc$SampleID <- rownames(df.nmds.bc.nc)
+df.nmds.bc.nc.all <- merge(df.nmds.bc.nc, ger.map)
 
 ## all samples by space type
-gg.pcoa.can.g <- ggplot(df.pcoa.can.g.all, aes(x = PCoA1, y = PCoA2, color = SpaceTypeBioBE))
-gg.pcoa.can.g + geom_point(size = 3) +
-  geom_text(aes(y = PCoA2 + 0.01, label = Description), size = 3, vjust = 0) + 
+gg.nmds.bc.nc <- ggplot(df.nmds.bc.nc.all, aes(x = NMDS1, y = NMDS2, color = SpaceTypeBioBE))
+gg.nmds.bc.nc + geom_point(size = 3) +
+  # ggtitle('NMDS on Bray-Curtis') +
+  geom_text(aes(y = NMDS2 + 0.01, label = Description), size = 3, vjust = 0) + 
   scale_color_manual(values = mycol.12)
-ggsave('figures/pcoa_can_g_sampletype.png')
+ggsave('figures/nmds_bc_g_sampletype.png', width = 8, height = 6.5, units = 'in')
 
+####################################
+## plot Bray-Curtis pcoa with crack/chem data
 ## crack area NSF
-gg.pcoa.can.g <- ggplot(df.pcoa.can.g.all, aes(x = PCoA1, y = PCoA2, color = SpaceTypeBioBE, size = CrackAreaNSF))
-gg.pcoa.can.g + 
-  geom_point(data = df.pcoa.can.g.all[df.pcoa.can.g.all$CrackNSFAvail == FALSE,], 
+gg.pcoa.bc.nc <- ggplot(df.pcoa.bc.nc.all, aes(x = PCoA1, y = PCoA2, color = SpaceTypeBioBE, size = CrackAreaNSF))
+gg.pcoa.bc.nc +   
+  geom_point(data = df.pcoa.bc.nc.all[df.pcoa.bc.nc.all$CrackNSFAvail == FALSE,], 
              aes(x = PCoA1, y = PCoA2), 
              size = 2, pch = 1, na.rm = FALSE) +
   geom_point() + 
   scale_size_continuous(range = c(3,8)) +
   scale_color_manual(values = mycol.12)
-ggsave('figures/pcoa_can_g_crackarea.png')
+ggsave('figures/pcoa_bc_g_crackarea.png', width = 8, height = 6.5, units = 'in')
 
 ## chem = TCSavg  
-gg.pcoa.can.g <- ggplot(df.pcoa.can.g.all, aes(x = PCoA1, y = PCoA2, color = SpaceTypeBioBE, size = TCSavg))
-gg.pcoa.can.g + 
-  geom_point(data = df.pcoa.can.g.all[df.pcoa.can.g.all$ChemAvail == FALSE,], 
+gg.pcoa.bc.nc <- ggplot(df.pcoa.bc.nc.all, aes(x = PCoA1, y = PCoA2, color = SpaceTypeBioBE, size = TCSavg))
+gg.pcoa.bc.nc + 
+  geom_point(data = df.pcoa.bc.nc.all[df.pcoa.bc.nc.all$ChemAvail == FALSE,], 
              aes(x = PCoA1, y = PCoA2), 
              size = 2, pch = 1) +
   geom_point() + 
   scale_color_manual(values = mycol.12) + 
   scale_size_continuous(range = c(3,8))
-ggsave('figures/pcoa_can_g_TCSavg.png')
+ggsave('figures/pcoa_bc_g_TCSavg.png', width = 8, height = 6.5, units = 'in')
 
 ## chem = TCCavg  
-gg.pcoa.can.g <- ggplot(df.pcoa.can.g.all, aes(x = PCoA1, y = PCoA2, color = SpaceTypeBioBE, size = TCCavg))
-gg.pcoa.can.g + 
-  geom_point(data = df.pcoa.can.g.all[df.pcoa.can.g.all$ChemAvail == FALSE,], 
+gg.pcoa.bc.nc <- ggplot(df.pcoa.bc.nc.all, aes(x = PCoA1, y = PCoA2, color = SpaceTypeBioBE, size = TCCavg))
+gg.pcoa.bc.nc + 
+  geom_point(data = df.pcoa.bc.nc.all[df.pcoa.bc.nc.all$ChemAvail == FALSE,], 
              aes(x = PCoA1, y = PCoA2), 
              size = 2, pch = 1) +
   geom_point() + 
   scale_color_manual(values = mycol.12) + 
   scale_size_continuous(range = c(3,8))
-ggsave('figures/pcoa_can_g_TCCavg.png')
+ggsave('figures/pcoa_bc_g_TCCavg.png', width = 8, height = 6.5, units = 'in')
 
 ## chem = MePBavg  
-gg.pcoa.can.g <- ggplot(df.pcoa.can.g.all, aes(x = PCoA1, y = PCoA2, color = SpaceTypeBioBE, size = MePBavg))
-gg.pcoa.can.g + 
-  geom_point(data = df.pcoa.can.g.all[df.pcoa.can.g.all$ChemAvail == FALSE,], 
+gg.pcoa.bc.nc <- ggplot(df.pcoa.bc.nc.all, aes(x = PCoA1, y = PCoA2, color = SpaceTypeBioBE, size = MePBavg))
+gg.pcoa.bc.nc + 
+  geom_point(data = df.pcoa.bc.nc.all[df.pcoa.bc.nc.all$ChemAvail == FALSE,], 
              aes(x = PCoA1, y = PCoA2), 
              size = 2, pch = 1) +
   geom_point() + 
   scale_color_manual(values = mycol.12) + 
   scale_size_continuous(range = c(3,8))
-ggsave('figures/pcoa_can_g_MePBavg.png')
+ggsave('figures/pcoa_bc_g_MePBavg.png', width = 8, height = 6.5, units = 'in')
 
 ## chem = EtPBavg  
-gg.pcoa.can.g <- ggplot(df.pcoa.can.g.all, aes(x = PCoA1, y = PCoA2, color = SpaceTypeBioBE, size = EtPBavg))
-gg.pcoa.can.g + 
-  geom_point(data = df.pcoa.can.g.all[df.pcoa.can.g.all$ChemAvail == FALSE,], 
+gg.pcoa.bc.nc <- ggplot(df.pcoa.bc.nc.all, aes(x = PCoA1, y = PCoA2, color = SpaceTypeBioBE, size = EtPBavg))
+gg.pcoa.bc.nc + 
+  geom_point(data = df.pcoa.bc.nc.all[df.pcoa.bc.nc.all$ChemAvail == FALSE,], 
              aes(x = PCoA1, y = PCoA2), 
              size = 2, pch = 1) +
   geom_point() + 
   scale_color_manual(values = mycol.12) + 
   scale_size_continuous(range = c(3,8))
-ggsave('figures/pcoa_can_g_EtPBavg.png')
+ggsave('figures/pcoa_bc_g_EtPBavg.png', width = 8, height = 6.5, units = 'in')
 
 ## chem = PrPBavg  
-gg.pcoa.can.g <- ggplot(df.pcoa.can.g.all, aes(x = PCoA1, y = PCoA2, color = SpaceTypeBioBE, size = PrPBavg))
-gg.pcoa.can.g + 
-  geom_point(data = df.pcoa.can.g.all[df.pcoa.can.g.all$ChemAvail == FALSE,], 
+gg.pcoa.bc.nc <- ggplot(df.pcoa.bc.nc.all, aes(x = PCoA1, y = PCoA2, color = SpaceTypeBioBE, size = PrPBavg))
+gg.pcoa.bc.nc + 
+  geom_point(data = df.pcoa.bc.nc.all[df.pcoa.bc.nc.all$ChemAvail == FALSE,], 
              aes(x = PCoA1, y = PCoA2), 
              size = 2, pch = 1) +
   geom_point() + 
   scale_color_manual(values = mycol.12) + 
   scale_size_continuous(range = c(3,8))
-ggsave('figures/pcoa_can_g_PrPBavg.png')
+ggsave('figures/pcoa_bc_g_PrPBavg.png', width = 8, height = 6.5, units = 'in')
 
 ## chem = BuBPavg  
-gg.pcoa.can.g <- ggplot(df.pcoa.can.g.all, aes(x = PCoA1, y = PCoA2, color = SpaceTypeBioBE, size = BuPBavg))
-gg.pcoa.can.g + 
-  geom_point(data = df.pcoa.can.g.all[df.pcoa.can.g.all$ChemAvail == FALSE,], 
+gg.pcoa.bc.nc <- ggplot(df.pcoa.bc.nc.all, aes(x = PCoA1, y = PCoA2, color = SpaceTypeBioBE, size = BuPBavg))
+gg.pcoa.bc.nc + 
+  geom_point(data = df.pcoa.bc.nc.all[df.pcoa.bc.nc.all$ChemAvail == FALSE,], 
              aes(x = PCoA1, y = PCoA2), 
              size = 2, pch = 1) +
   geom_point() + 
   scale_color_manual(values = mycol.12) + 
   scale_size_continuous(range = c(3,8))
-ggsave('figures/pcoa_can_g_BuPBavg.png')
+ggsave('figures/pcoa_bc_g_BuPBavg.png', width = 8, height = 6.5, units = 'in')
