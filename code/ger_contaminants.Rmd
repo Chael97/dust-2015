@@ -375,8 +375,8 @@ plot(bc.nc, bc)
 
 Compare PCoA plots
 ```{r}
-pcoa.bc.nc <- cmdscale(t(bc.nc), eig = TRUE)
-pcoa.bc <- cmdscale(t(bc), eig = TRUE)
+pcoa.bc.nc <- cmdscale(bc.nc, eig = TRUE)
+pcoa.bc <- cmdscale(bc, eig = TRUE)
 
 plot(pcoa.bc.nc$points, type = 'n')
 points(pcoa.bc.nc$points[control, ], pch = 17, col = ger.map$bg[control])
@@ -385,6 +385,14 @@ points(pcoa.bc.nc$points[samples, ], pch = 16, col = ger.map$bg[samples])
 plot(pcoa.bc$points, type = 'n')
 points(pcoa.bc$points[control, ], pch = 17, col = ger.map$bg[control])
 points(pcoa.bc$points[samples, ], pch = 16, col = ger.map$bg[samples])
+```
+
+Make tSNE plots (new alternative ordination strategy)
+```{r}
+tsne.bc.nc <- tsne(bc.nc)
+plot(tsne.bc.nc, type = 'n')
+points(tsne.bc.nc[control, ], pch = 17, col = ger.map$bg[control])
+points(tsne.bc.nc[samples, ], pch = 16, col = ger.map$bg[samples])
 ```
 
 Run some stats to see if space type explains dissimilarity
