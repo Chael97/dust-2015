@@ -31,11 +31,12 @@ load('results/otu_setup/ger_rm_contaminants.RData')
 ger.nc.prop <- prop.table(ger.nc, margin = 1)
 
 ## subset to top 25 taxa
-pick <- order(apply(ger.nc.prop, 2, median), decreasing=TRUE)[1:15]
+# pick <- order(apply(ger.nc.prop, 2, median), decreasing=TRUE)[1:25]
+pick <- order(colSums(ger.nc.prop), decreasing=TRUE)[1:25]
 
-png('figures/ger_heatmap_top15_genus.png', width = 6, height = 6, res = 300, units = 'in', pointsize = 8)
-heatmap.2(ger.nc.prop[,pick], scale = 'none', trace = 'none',
-          col = brewer.pal(9, 'YlGnBu'), margin = c(10,10), 
+png('figures/ger_heatmap_top25_genus.png', width = 6, height = 6, res = 300, units = 'in', pointsize = 8)
+heatmap.2(ger.nc.prop[,pick], trace = 'none',
+          col = colorRampPalette(brewer.pal(9, 'YlGnBu'))(100), margin = c(10,10), 
           keysize = 1, density.info = 'none', key.title = '', key.xlab = 'Proportion',
           labRow = ger.map[row.names(ger.nc.prop), 'SpaceType'],
           labCol = consensus.nc[colnames(ger.nc.prop[,pick])])

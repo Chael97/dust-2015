@@ -8,12 +8,14 @@ library(reshape)
 library(RColorBrewer)
 
 ## input sourcetracker results (R data)
-load('results/sourcetracker_out/ger_wood_barberan_genus_subsample50/results.RData')
+# load('results/sourcetracker_out/ger_wood_barberan_genus_subsample50/results.RData')
+load('results/sourcetracker_out/ger_wood_barberan_genus/results.RData')
 res <- results
 rm(results)
 
 ## input sourcetracker output map files
-map.out <- read.table('results/sourcetracker_out/ger_wood_barberan_genus_subsample50/map.txt',
+# map.out <- read.table('results/sourcetracker_out/ger_wood_barberan_genus_subsample50/map.txt',
+map.out <- read.table('results/sourcetracker_out/ger_wood_barberan_genus/map.txt',
                       header = T, sep = '\t', row.names = 1, comment.char = '')
 
 ## note control samples
@@ -23,7 +25,7 @@ control.id <- rownames(map.out)[grep('oneuLcontroL', rownames(map.out))]
 prop.pick <- c('Env', 'TITLE', 'Proportion_Human.Feces', 'Proportion_Human.Mouth', 'Proportion_Human.Skin', 
                'Proportion_Human.Urine', 'Proportion_Human.Vagina', 'Proportion_Unknown')
 
-res.prop <- map.out[map.out$SourceSink == 'sink', prop.pick]
+res.prop <- map.out[which(map.out$SourceSink == 'sink'), prop.pick]
 res.prop$SampleID <- rownames(res.prop)
 
 ## melt dataframe for barplots
@@ -56,7 +58,8 @@ gg.prop.bar + geom_bar(stat = 'identity') +
   ylab('Proportion') +
   coord_flip() +
   theme_bw()
-ggsave('figures/ger_sourcetracker_genus.png', width = 8, height = 10)
+ggsave('figures/ger_sourcetracker_genus_fulldata.png', width = 8, height = 10)
+# ggsave('figures/ger_sourcetracker_genus.png', width = 8, height = 10)
 
 ## summarize all human together
 res.prop.2 <- res.prop
@@ -72,7 +75,7 @@ res.prop.2 <- res.prop.2[ , c('Env', 'TITLE', 'SampleID',
 gg.prop.2.hist <- ggplot(res.prop.2, aes(x = Proportion_Human, fill = TITLE))
 gg.prop.2.hist + geom_density(alpha = 0.6, adjust = 0.75) +
   # geom_line(stat = 'density', adjust = 0.75) +
-  scale_fill_manual(values = c('darkgoldenrod4', 'yellow2', 'cadetblue2'),
+  scale_fill_manual(values = c('magenta4', 'yellow2', 'cadetblue2'),
                     limits = c('Gerlinger',                                                               
                                'Athletic equipment microbiota are shaped by interactions with human skin',
                                'The ecology of microscopic life in household dust'), 
@@ -87,14 +90,15 @@ gg.prop.2.hist + geom_density(alpha = 0.6, adjust = 0.75) +
   theme_bw() +
   theme(legend.key = element_rect(colour = 'black'), legend.background = element_blank(),
         legend.position = c(1,1), legend.justification = c(1,1))
-ggsave('figures/ger_wood_barberan_sourcetracker_genus_density.png', width = 6, height = 6)
+ggsave('figures/ger_wood_barberan_sourcetracker_genus_density_fulldata.png', width = 6, height = 6)
+# ggsave('figures/ger_wood_barberan_sourcetracker_genus_density.png', width = 6, height = 6)
 
 ## violin plot of 3 studies
 gg.prop.2.vio <- ggplot(res.prop.2, aes(x = TITLE, y = Proportion_Human, fill = TITLE))
 gg.prop.2.vio + geom_violin(adjust = 0.75) +
   geom_boxplot(width = 0.1, fill = 'black', outlier.color = NA) +
   stat_summary(fun.y = median, geom = 'point', fill = 'white', shape = 21, size = 2.5) +
-  scale_fill_manual(values = c('darkgoldenrod4', 'yellow2', 'cadetblue2'),
+  scale_fill_manual(values = c('magenta4', 'yellow2', 'cadetblue2'),
                     limits = c('Gerlinger',                                                               
                                'Athletic equipment microbiota are shaped by interactions with human skin',
                                'The ecology of microscopic life in household dust'), 
@@ -114,8 +118,8 @@ gg.prop.2.vio + geom_violin(adjust = 0.75) +
   theme_bw() +
   theme(legend.key = element_rect(colour = 'black'), legend.background = element_blank(),
         legend.position = c(1,1), legend.justification = c(1,1))
-ggsave('figures/ger_wood_barberan_sourcetracker_genus_violin.png', width = 6, height = 6)
-
+ggsave('figures/ger_wood_barberan_sourcetracker_genus_violin_fulldata.png', width = 6, height = 6)
+# ggsave('figures/ger_wood_barberan_sourcetracker_genus_violin.png', width = 6, height = 6)
 
 ## box plot of 3 studies
 # gg.prop.2.box <- ggplot(res.prop.2, aes(x = TITLE, y = Proportion_Human, fill = TITLE))
