@@ -9,17 +9,16 @@ Adapted from analysis by James Meadow for human microbial cloud study (original 
 
 Load data.
 ```{r}
-setwd('~/Documents/projects/gerlinger/')
-
 library(vegan)
 library(labdsv)
+library(RColorBrewer)
 
-source('code/meadow_pb_functions.R')
+source('~/Documents/projects/gerlinger/code/meadow_pb_functions.R')
 ```
 
 ```{r}
 ## read in the genus-level OTU table
-ger <- read.table('data/tax_16S_uparse/count_tables/gerlinger_uparse_merged_taxonomy_summaries/gerlinger_uparse_merged_L6.txt',
+ger <- read.table('~/Documents/projects/gerlinger/data/tax_16S_uparse/count_tables/gerlinger_uparse_merged_taxonomy_summaries/gerlinger_uparse_merged_L6.txt',
                     header = TRUE, sep = '\t', row.names = 1, comment.char = '', skip = 1)
 ger <- t(ger)
 
@@ -33,7 +32,7 @@ colnames(ger) <- gsub('g__', '', colnames(ger))
 ger.tax <- colnames(ger)
 
 ## read in mapping file with metadata
-ger.map.orig <- read.table('data/map_files/151028_map_edit_finalchems_crack_plus.txt',
+ger.map.orig <- read.table('~/Documents/projects/gerlinger/data/map_files/151125_map_edit_finalchems_crack_plus.txt',
                            header = TRUE, sep = '\t', row.names = 1, comment.char = '')
 ger.map.orig$SampleID <- row.names(ger.map.orig)
 
@@ -133,13 +132,23 @@ for(i in 1:length(spaces)){
 ger.map$pch2 <- ger.map$pch
 ger.map$pch2[ger.map$SpaceTypeBioBE == 'neg.control'] <- 24
 
-mycol.11 <- c('#A6CEE3', '#1F78B4', '#B2DF8A', '#33A02C', '#FB9A99', '#E31A1C', 
-              '#FDBF6F', '#FF7F00', '#CAB2D6', '#6A3D9A', '#B15928')
+# mycol.11 <- c('#A6CEE3', '#1F78B4', '#B2DF8A', '#33A02C', '#FB9A99', '#E31A1C', 
+              # '#FDBF6F', '#FF7F00', '#CAB2D6', '#6A3D9A', '#B15928')
+
+## custom color palette (http://www.r-bloggers.com/the-paul-tol-21-color-salute/)
+# mycol.10 <- c("#332288", "#88CCEE", "#44AA99", "#117733", "#999933", 
+              # "#DDCC77", "#661100", "#CC6677", "#882255", "#AA4499")
+
+## custom color palette
+mycol.10 <- c("#0000A9", "#0049FF", "#00A4DE", "turquoise", "chartreuse3", 
+              "#FFD701", "#FF9500", "#FF3300", "darkmagenta", "slategrey")
+names(mycol.10) <- c('building.support', 'circulation', 'classroom', 'gym', 'laundry', 
+                     'lockers', 'office', 'pool', 'restroom', 'neg.control')
 
 ger.map$bg <- 'gray60'
 
 for(i in 1:length(spaces)){
-  ger.map$bg[spaces.counts[[i]]] <- mycol.11[i]  
+  ger.map$bg[spaces.counts[[i]]] <- mycol.10[i]  
 }
 ```
 
@@ -208,7 +217,7 @@ con.cum.1000 <- cumsum(rev(control.taxa.1000))
 sam.cum.1000 <- cumsum(rev(sample.taxa.1000))
 ```
 
-Halomonas is abundant in both the controls and samples and causes a big jump in the cumulative sum.
+Halomonas is abundant in both the controls and samples and causes a big jump in the cumulative sum. Shewanella is also consistently elevated in both controls along with 4 samples but is not one of the most abundant taxa overall.
 ```{r}
 rev(sort(colSums(ger.10K)))[1:10] # Halomonas is #2 in list
 rev(sort(colSums(ger.10K)))[2]/sum(ger.10K) # 5.8%
@@ -232,7 +241,7 @@ Although there are 5 OTUs matching 'Halomonadaceae', only one (the first in the 
 
 Big panel figure showing each top contaminant in the dataset and its influence on NMDS1.
 ```{r}
-pdf('figures/contaminationTop10.pdf', height=10, width=10, useDingbats=TRUE)
+pdf('~/Documents/projects/gerlinger/figures/contaminationTop10.pdf', height=10, width=10, useDingbats=TRUE)
 layout(matrix(c(11:15, 1:10, 16:20), 5, 4), 
        heights = c(1, 1, 1, 1, 1.5), 
        widths = c(1, 2, 2, 1))
@@ -389,6 +398,8 @@ points(pcoa.bc$points[samples, ], pch = 16, col = ger.map$bg[samples])
 
 Make tSNE plots (new alternative ordination strategy)
 ```{r}
+library(tsne)
+
 tsne.bc.nc <- tsne(bc.nc)
 plot(tsne.bc.nc, type = 'n')
 points(tsne.bc.nc[control, ], pch = 17, col = ger.map$bg[control])
@@ -407,5 +418,5 @@ rm(ger.10K.ra, ger.10K, top.10, top.100, top.1000, can, con.cum.10, con.cum.100,
    control.taxa.10, control.taxa.100, control.taxa.1000, halo, haloCol, i, id, idCol, mito, nmds.can,
    ocu, plants, sam.cum.10, sam.cum.100, sam.cum.1000, sample.ignore, sample.taxa.10, sample.taxa.100,
    sample.taxa.1000, spaces.counts, ucu, x.lim, xbuff, xdown, xup, y.lim, yax, ybuff, ydown, yup)
-save.image('results/otu_setup/ger_rm_contaminants.RData')
+save.image('~/Documents/projects/gerlinger/results/otu_setup/ger_rm_contaminants.RData')
 ```
