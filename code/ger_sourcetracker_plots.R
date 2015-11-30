@@ -48,13 +48,13 @@ ord.env <- c(as.character(map.out$Env[order(map.out$Env)][rownames(map.out)[orde
 gg.prop.bar <- ggplot(res.prop.lg.ger, aes(x = SampleID, y = value, fill = variable))
 gg.prop.bar + geom_bar(stat = 'identity') +
   scale_fill_manual(values = c(brewer.pal(11, 'Spectral')[c(11,10,9,8,7)], 
-                               'grey90'),
+                               'gainsboro'),
                     labels = c('Human Feces', 'Human Mouth', 'Human Skin',
-                               'Human Urine', 'Human Vagina', 'Unknown'),
+                               'Human Urine', 'Human Vagina', 'Environmental/Other'),
                     name = 'Putative Source') +
   scale_x_discrete(limits = rev(ord.id), 
                    labels = rev(ord.env)) +
-  xlab('Room Type') +
+  xlab('Space Type') +
   ylab('Proportion') +
   coord_flip() +
   theme_bw()
@@ -75,7 +75,7 @@ res.prop.2 <- res.prop.2[ , c('Env', 'TITLE', 'SampleID',
 gg.prop.2.hist <- ggplot(res.prop.2, aes(x = Proportion_Human, fill = TITLE))
 gg.prop.2.hist + geom_density(alpha = 0.6, adjust = 0.75) +
   # geom_line(stat = 'density', adjust = 0.75) +
-  scale_fill_manual(values = c('magenta4', 'yellow2', 'cadetblue2'),
+  scale_fill_manual(values = c('darkmagenta', '#FFD701', 'turquoise'),
                     limits = c('Gerlinger',                                                               
                                'Athletic equipment microbiota are shaped by interactions with human skin',
                                'The ecology of microscopic life in household dust'), 
@@ -98,33 +98,32 @@ gg.prop.2.vio <- ggplot(res.prop.2, aes(x = TITLE, y = Proportion_Human, fill = 
 gg.prop.2.vio + geom_violin(adjust = 0.75) +
   geom_boxplot(width = 0.1, fill = 'black', outlier.color = NA) +
   stat_summary(fun.y = median, geom = 'point', fill = 'white', shape = 21, size = 2.5) +
-  scale_fill_manual(values = c('magenta4', 'yellow2', 'cadetblue2'),
+  scale_fill_manual(values = c('darkmagenta', '#FFD701', 'turquoise'),
                     limits = c('Gerlinger',                                                               
                                'Athletic equipment microbiota are shaped by interactions with human skin',
                                'The ecology of microscopic life in household dust'), 
                     labels = c('Gerlinger',
                                'Athletic Facilities',
-                               'Homes'),
-                    name = 'Study') +
+                               'Homes')) +
   scale_x_discrete(limits = c('Gerlinger',                                                               
                               'Athletic equipment microbiota are shaped by interactions with human skin',
                               'The ecology of microscopic life in household dust'), 
                    labels = c('Gerlinger',
                               'Athletic Facilities',
                               'Homes')) +
-  xlab('Proportion of putative human-sourced bacteria') + 
-  ylab('Frequency') +
-  guides(fill = guide_legend(override.aes = list(colour = NULL))) +
+  ylab('Proportion of putative human-sourced bacteria') + 
+  xlab('Study') +
   theme_bw() +
-  theme(legend.key = element_rect(colour = 'black'), legend.background = element_blank(),
-        legend.position = c(1,1), legend.justification = c(1,1))
+  theme(legend.position = 'none')
+  # theme(legend.key = element_rect(colour = 'black'), legend.background = element_blank(),
+        # legend.position = c(1,1), legend.justification = c(1,1))
 ggsave('figures/ger_wood_barberan_sourcetracker_genus_violin_fulldata.png', width = 6, height = 6)
 # ggsave('figures/ger_wood_barberan_sourcetracker_genus_violin.png', width = 6, height = 6)
 
 ## box plot of 3 studies
 # gg.prop.2.box <- ggplot(res.prop.2, aes(x = TITLE, y = Proportion_Human, fill = TITLE))
 # gg.prop.2.box + geom_boxplot(show_guide = FALSE) + 
-#   scale_fill_manual(values = c('darkgoldenrod4', 'yellow2', 'cadetblue2'),
+#   scale_fill_manual(values = c('darkmagenta', '#FFD701', 'turquoise'),
 #                     limits = c('Gerlinger',                                                               
 #                                'Athletic equipment microbiota are shaped by interactions with human skin',
 #                                'The ecology of microscopic life in household dust'), 
