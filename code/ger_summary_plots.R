@@ -11,10 +11,6 @@ library(plyr)
 library(phyloseq)
 library(gplots)
 
-## load custom functions
-# source('code/custom_ggplot_settings.R')
-# source('code/custom_heatmap.3.R')
-
 ## load OTU table and map file from post-contaminant filtering
 # load('results/otu_setup/ger_otu_setup.RData')
 load('results/otu_setup/ger_rm_contaminants.RData')
@@ -51,6 +47,17 @@ legend(0.9, 1.1, bty = 'n', cex = 0.7, title = 'Space Type',
        legend = c('building.support', 'circulation', 'classroom', 'gym', 'laundry', 
                   'lockers', 'office', 'pool', 'restroom', 'neg.control'),
        fill = mycol.10, border = 'white')
+dev.off()
+
+png('figures/ger_heatmap_top25_genus_v2.png', width = 7, height = 6, res = 300, units = 'in', pointsize = 8)
+heatmap.2(t(ger.nc.prop[,pick]), trace = 'none',
+          col = colorRampPalette(brewer.pal(9, 'YlGnBu'))(100), margin = c(6,10),
+          # ColSideColors = mycol,
+          density.info = 'none', 
+          keysize = 1, key.title = '', key.xlab = 'Proportion',
+          labCol = ger.map[row.names(ger.nc.prop), 'Description'],
+          labRow = consensus.nc[colnames(ger.nc.prop[,pick])],
+          xlab = 'Sample', ylab = 'Taxon')
 dev.off()
 
 ####################################
