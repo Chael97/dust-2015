@@ -1,5 +1,5 @@
 ---
-title: "Look for contamination in Gerlinger data"
+title: "Look for contamination in Gerlinger 16S rRNA data"
 author: "Roxana Hickey"
 date: "November 4, 2015"
 output: html_document
