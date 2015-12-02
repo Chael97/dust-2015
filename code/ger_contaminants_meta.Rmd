@@ -12,6 +12,7 @@ Load data.
 library(vegan)
 library(labdsv)
 library(RColorBrewer)
+library(gplots)
 
 source('~/Documents/projects/gerlinger/code/meadow_pb_functions.R')
 ```
@@ -19,7 +20,7 @@ source('~/Documents/projects/gerlinger/code/meadow_pb_functions.R')
 Read in the OTU table (relative abundance)
 ```{r}
 ## read in the genus-level OTU table
-ger.meta <- read.table('data/tax_shotgun_metaphlan/AAGAGGCA-AGAGGATA_S4cat_R1_001.fastq.metaphlan2_merged_meta_L6.txt', header = T, sep = '\t', row.names = 1)
+ger.meta <- read.table('~/Documents/projects/gerlinger/data/tax_shotgun_metaphlan/AAGAGGCA-AGAGGATA_S4cat_R1_001.fastq.metaphlan2_merged_meta_L6.txt', header = T, sep = '\t', row.names = 1)
 ger.meta <- t(ger.meta)
 
 colnames(ger.meta) <- gsub('k__', '', colnames(ger.meta))
@@ -181,7 +182,7 @@ rev(sort(colSums(ger.meta)))[1:10]
 
 Big panel figure showing each top contaminant in the dataset and its influence on NMDS1.
 ```{r}
-pdf('~/Documents/projects/gerlinger/figures/contaminationTop10_meta.pdf', height=8, width=10, useDingbats=TRUE)
+pdf('~/Documents/projects/gerlinger/figures/contaminationTop2_meta.pdf', height=8, width=10, useDingbats=TRUE)
 par(mfrow = c(1, 2), mar = c(2,4,2,2), las = 1, fg = "gray40", col.axis = "gray40", col.lab = "gray40")
 for (i in 1:2) {
     id <- names(control.taxa.10)[i]
@@ -194,10 +195,10 @@ for (i in 1:2) {
     xbuff <- sum(abs(x.lim))/8
 
     plot(idCol ~ nmds.bc.meta$points[, 1], ylim = c(y.lim + c(-ybuff, 2 * ybuff)), 
-         xlim = c(x.lim + c(-xbuff, xbuff)), type = "n", xaxt = "n", yaxt = "n", 
+         xlim = c(x.lim + c(-xbuff, xbuff)), type = "n", 
          xlab = "NMDS1", ylab = "Relative Abundance")
     
-    axis(side = yax, at = y.lim, labels = TRUE)
+    # axis(side = yax, at = y.lim, labels = TRUE)
     
     points(idCol[control] ~ nmds.bc.meta$points[control, 1], pch = 17, col = ger.meta.map$bg[control])
     
@@ -285,7 +286,7 @@ pick <- order(colSums(ger.meta), decreasing=TRUE)[1:25]
 identical(row.names(ger.meta), row.names(ger.meta.map))
 mycol <- mycol.10[match(ger.meta.map$SpaceTypeBioBE, names(mycol.10))]
 
-png('figures/ger_meta_heatmap_top25_genus_withPropi.png', width = 7, height = 6, res = 300, units = 'in', pointsize = 8)
+png('~/Documents/projects/gerlinger/figures/ger_meta_heatmap_top25_genus_withPropi.png', width = 7, height = 6, res = 300, units = 'in', pointsize = 8)
 par(xpd = TRUE)
 heatmap.2(t(ger.meta[,pick]), trace = 'none',
           col = colorRampPalette(brewer.pal(9, 'YlGnBu'))(100), margin = c(6,10),
@@ -308,7 +309,7 @@ pick <- order(colSums(ger.meta.nc), decreasing=TRUE)[1:25]
 identical(row.names(ger.meta.nc), row.names(ger.meta.map))
 mycol <- mycol.10[match(ger.meta.map$SpaceTypeBioBE, names(mycol.10))]
 
-png('figures/ger_meta_heatmap_top25_genus_noPropi.png', width = 7, height = 6, res = 300, units = 'in', pointsize = 8)
+png('~/Documents/projects/gerlinger/figures/ger_meta_heatmap_top25_genus_noPropi.png', width = 7, height = 6, res = 300, units = 'in', pointsize = 8)
 par(xpd = TRUE)
 heatmap.2(t(ger.meta.nc[,pick]), trace = 'none',
           col = colorRampPalette(brewer.pal(9, 'YlGnBu'))(100), margin = c(6,10),
