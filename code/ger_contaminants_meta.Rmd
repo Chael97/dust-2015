@@ -1,0 +1,333 @@
+---
+title: "Look for contamination in Gerlinger metagenomics MetaPhlAn data"
+author: "Roxana Hickey"
+date: "December 1, 2015"
+output: html_document
+---
+
+Adapted from analysis by James Meadow for human microbial cloud study (original script [here](https://github.com/jfmeadow/Meadow_HumanMicrobialCloud_Analysis/blob/master/manuscript_code/contamination/pb_contamination.md)).
+
+Load data.
+```{r}
+library(vegan)
+library(labdsv)
+library(RColorBrewer)
+
+source('~/Documents/projects/gerlinger/code/meadow_pb_functions.R')
+```
+
+Read in the OTU table (relative abundance)
+```{r}
+## read in the genus-level OTU table
+ger.meta <- read.table('data/tax_shotgun_metaphlan/AAGAGGCA-AGAGGATA_S4cat_R1_001.fastq.metaphlan2_merged_meta_L6.txt', header = T, sep = '\t', row.names = 1)
+ger.meta <- t(ger.meta)
+
+colnames(ger.meta) <- gsub('k__', '', colnames(ger.meta))
+colnames(ger.meta) <- gsub('p__', '', colnames(ger.meta))
+colnames(ger.meta) <- gsub('c__', '', colnames(ger.meta))
+colnames(ger.meta) <- gsub('o__', '', colnames(ger.meta))
+colnames(ger.meta) <- gsub('f__', '', colnames(ger.meta))
+colnames(ger.meta) <- gsub('g__', '', colnames(ger.meta))
+colnames(ger.meta) <- gsub('Other', '', colnames(ger.meta))
+
+ger.meta.tax <- colnames(ger.meta)
+
+## read in master sample ID key
+sid.key <- read.table('~/Documents/projects/gerlinger/data/sampleid_master_key.txt',
+                      sep = '\t', header = T, row.names = NULL)
+rownames(ger.meta) %in% sid.key$metaphlan_barcode
+
+## replace sample IDs to match 16S data
+ger.meta.orig <- ger.meta
+rownames(ger.meta) <- sid.key$uparse_sampleid[match(rownames(ger.meta.orig), sid.key$metaphlan_barcode)]
+
+## read in mapping file with metadata
+ger.map.orig <- read.table('~/Documents/projects/gerlinger/data/map_files/151125_map_edit_finalchems_crack_plus.txt',
+                           header = TRUE, sep = '\t', row.names = 1, comment.char = '')
+ger.map.orig$SampleID <- row.names(ger.map.orig)
+
+## reduce mapping file to samples in MetaPhlAn dataset
+ger.meta.map <- ger.map.orig[ger.map.orig$SampleID %in% rownames(ger.meta),]
+
+## check that all sample names match
+all(row.names(ger.meta.map) %in% row.names(ger.meta))
+
+dim(ger.meta.map)
+dim(ger.meta)
+
+## reorder map to match OTU table
+ger.meta.map <- ger.meta.map[row.names(ger.meta), ]
+identical(row.names(ger.meta), row.names(ger.meta.map))
+
+## see how many taxa there are
+length(ger.meta.tax)
+```
+
+Plant and mitochondrial sequences are not present in the MetaPhlAn data, so we do not need to remove them manually as we did with the 16S rRNA data. Next, we'll make a taxonomy data frame for indexing.
+```{r}
+taxo <- makeTaxo(ger.meta.tax, ger.meta)
+head(taxo)
+```
+
+Get rid of empty OTUs to reduce computing demand.
+```{r}
+taxo <- taxo[colnames(ger.meta), ]
+head(taxo)
+
+dim(taxo)
+dim(ger.meta)
+
+identical(row.names(taxo), colnames(ger.meta))
+```
+
+Quick reference vector of names for figures and whatnot. Some genus, families, etc are empty, so search for the finest taxonomic level and use that name.
+```{r}
+consensus <- apply(taxo[, 1:6], 1, cons)
+consensus[1:10]
+```
+
+Some indexing and metadata stuff for figures and such.
+```{r}
+ger.meta.map$pch <- 21
+table(ger.meta.map$SpaceTypeBioBE)
+
+control <- which(ger.meta.map$SpaceTypeBioBE == 'neg.control')
+samples <- which(ger.meta.map$SpaceTypeBioBE != 'neg.control')
+
+spaces <- unique(ger.meta.map$SpaceTypeBioBE)
+spaces <- spaces[-10]
+
+spaces.counts <- list()
+for(i in 1:length(spaces)){
+  spaces.counts[[i]] <- which(ger.meta.map$SpaceTypeBioBE == spaces[i])
+}
+
+ger.meta.map$pch2 <- ger.meta.map$pch
+ger.meta.map$pch2[ger.meta.map$SpaceTypeBioBE == 'neg.control'] <- 24
+
+## custom color palette
+mycol.10 <- c("#0000A9", "#0049FF", "#00A4DE", "turquoise", "chartreuse3", 
+              "#FFD701", "#FF9500", "#FF3300", "darkmagenta", "slategrey")
+names(mycol.10) <- c('building.support', 'circulation', 'classroom', 'gym', 'laundry', 
+                     'lockers', 'office', 'pool', 'restroom', 'neg.control')
+
+ger.meta.map$bg <- 'gray60'
+
+for(i in 1:length(spaces)){
+  ger.meta.map$bg[spaces.counts[[i]]] <- mycol.10[i]  
+}
+```
+
+Make dissimilarity matrix; this may take a while. Make with both Canberra and Bray-Curtis, and then make NMDS ordinations. The Bray-Curtis will be more useful for identifying the influence of the most abundant taxa, while Canberra is used for analysis. Here, Canberra has high stress, so is not used much. Also quick plot to make sure that BC captures differences between groups.
+```{r}
+can.meta <- vegdist(ger.meta, 'canberra')
+bc.meta <- vegdist(ger.meta)
+
+nmds.can.meta <- nmds(can.meta)
+nmds.bc.meta <- nmds(bc.meta)
+
+plot(nmds.can.meta$points, col = ger.meta.map$SpaceTypeBioBE, type = "n")
+points(nmds.can.meta$points[control, ], pch = 17, col = ger.meta.map$bg[control])
+for(i in 1:length(spaces)){
+  points(nmds.can.meta$points[spaces.counts[[i]], ], 
+         pch = 16, col = ger.meta.map$bg[spaces.counts[[i]]])
+}
+
+plot(nmds.bc.meta$points, col = ger.meta.map$SpaceTypeBioBE, type = "n")
+points(nmds.bc.meta$points[control, ], pch = 17, col = ger.meta.map$bg[control])
+for(i in 1:length(spaces)){
+  points(nmds.bc.meta$points[spaces.counts[[i]], ], 
+         pch = 16, col = ger.meta.map$bg[spaces.counts[[i]]])
+}
+```
+
+The controls appear to be fairly well separated from the samples (along with a few samples that are in the upper left plot area with the controls), but at first glance no clear differences based on sample type (color) are evident.
+
+Find the 10 most abundant taxa. Use 10 for plotting, and take out those contaminants. Notably in this case, the only bacterial taxa found in the negative control are Propionibacterium (genus) and Propionibacteriaceae (family)
+```{r}
+## top 10 taxa
+control.taxa.10 <- rev(sort(ger.meta[control, ]))[1:10]/sum(ger.meta[control, ])
+sample.taxa.10 <- rev(sort(colSums(ger.meta[-control, ])))[1:10]/sum(ger.meta[-control, ])
+
+control.taxa.10['other'] <- 1 - sum(control.taxa.10)
+sample.taxa.10['other'] <- 1 - sum(sample.taxa.10)
+
+top.10 <- cbind(rev(control.taxa.10), rev(sample.taxa.10))
+# mids <- barplot(top.10, col = c('gray30', rep('gray70', 10)), border = 'gray30', space = 1)
+
+con.cum.10 <- cumsum(rev(control.taxa.10))
+sam.cum.10 <- cumsum(rev(sample.taxa.10))
+```
+
+Only Propionibacterium/Propionibacteriaceae are present in the negative control. In the samples, it accounts for just under 12% of the data.
+```{r}
+rev(sort(colSums(ger.meta)))[1:10]
+# rev(sort(colSums(ger.meta)))[2]/sum(ger.meta)
+
+# halo <- grep('Halomonadaceae', row.names(taxo), ignore.case = TRUE) # top Halomonas is #1 in list
+# taxo[halo, ]
+
+# ger.meta[, halo[1]] # only #1 and #4 are prevalent in controls
+
+# haloCol <- ger.meta[, halo[1]]
+
+# plot(haloCol ~ nmds.bc.meta$points[, 1], type = "n", xlab = 'NMDS 1', ylab = 'Halomonadaceae reads')
+# points(haloCol[control] ~ nmds.bc.meta$points[control, 1], pch = 21, bg = ger.meta.map$bg[control])
+# for(i in 1:length(spaces)){
+#   points(haloCol[spaces.counts[[i]]] ~ nmds.bc.meta$points[spaces.counts[[i]], 1], 
+#          pch = 16, col = ger.meta.map$bg[spaces.counts[[i]]])
+# }
+```
+
+Big panel figure showing each top contaminant in the dataset and its influence on NMDS1.
+```{r}
+pdf('~/Documents/projects/gerlinger/figures/contaminationTop10_meta.pdf', height=8, width=10, useDingbats=TRUE)
+par(mfrow = c(1, 2), mar = c(2,4,2,2), las = 1, fg = "gray40", col.axis = "gray40", col.lab = "gray40")
+for (i in 1:2) {
+    id <- names(control.taxa.10)[i]
+    print(taxo[id, ])
+    idCol <- ger.meta[, id]
+    print(sum(idCol)/sum(ger.meta))
+    y.lim <- round(range(idCol), 2)
+    ybuff <- y.lim[2]/8
+    x.lim <- round(range(nmds.bc.meta$points[, 1]), 2)
+    xbuff <- sum(abs(x.lim))/8
+
+    plot(idCol ~ nmds.bc.meta$points[, 1], ylim = c(y.lim + c(-ybuff, 2 * ybuff)), 
+         xlim = c(x.lim + c(-xbuff, xbuff)), type = "n", xaxt = "n", yaxt = "n", 
+         xlab = "NMDS1", ylab = "Relative Abundance")
+    
+    axis(side = yax, at = y.lim, labels = TRUE)
+    
+    points(idCol[control] ~ nmds.bc.meta$points[control, 1], pch = 17, col = ger.meta.map$bg[control])
+    
+    for(i in 1:length(spaces)){
+      points(idCol[spaces.counts[[i]]] ~ nmds.bc.meta$points[spaces.counts[[i]], 1], 
+             pch = 16, col = ger.meta.map$bg[spaces.counts[[i]]])
+    }
+    mtext(consensus[id], line = -1.5)
+}
+dev.off()
+```
+
+Now take out those most abundant in pcr controls.
+```{r}
+dim(ger.meta)
+
+ger.meta.nc <- ger.meta[, -which(colnames(ger.meta) %in% names(control.taxa.10[1:2]))]
+
+sort(rowSums(ger.meta.nc))
+
+# ger.meta.nc.6500 <- rrarefy(ger.meta.nc, 6500)
+# ger.meta.nc.6500 <- ger.meta.nc.6500[, -which(colSums(ger.meta.nc.6500) == 0)]
+# ger.meta.6500 <- rrarefy(ger.meta, 6500)
+# ger.meta.6500 <- ger.meta.6500[, -which(colSums(ger.meta.6500) == 0)]
+
+taxo.nc <- makeTaxo(ger.meta.tax[ger.meta.tax %in% colnames(ger.meta.nc)], ger.meta.nc)
+consensus.nc <- apply(taxo.nc[, 1:6], 1, cons)
+```
+
+Make same NMDS objects to compare.
+```{r}
+bc.meta.nc <- vegdist(ger.meta.nc)
+bc.meta <- vegdist(ger.meta)
+
+nmds.bc.meta.nc <- nmds(bc.meta.nc)
+nmds.bc.meta <- nmds(bc.meta)
+
+plot(nmds.bc.meta.nc$points, type = 'n')
+points(nmds.bc.meta.nc$points[control, ], pch = 17, col = ger.meta.map$bg[control])
+points(nmds.bc.meta.nc$points[samples, ], pch = 16, col = ger.meta.map$bg[samples])
+
+plot(nmds.bc.meta$points, type = 'n')
+points(nmds.bc.meta$points[control, ], pch = 17, col = ger.meta.map$bg[control])
+points(nmds.bc.meta$points[samples, ], pch = 16, col = ger.meta.map$bg[samples])
+
+plot(bc.meta.nc, bc.meta)
+```
+
+Compare PCoA plots
+```{r}
+pcoa.bc.meta.nc <- cmdscale(bc.meta.nc, eig = TRUE)
+pcoa.bc.meta <- cmdscale(bc.meta, eig = TRUE)
+
+plot(pcoa.bc.meta.nc$points, type = 'n')
+points(pcoa.bc.meta.nc$points[control, ], pch = 17, col = ger.meta.map$bg[control])
+points(pcoa.bc.meta.nc$points[samples, ], pch = 16, col = ger.meta.map$bg[samples])
+
+plot(pcoa.bc.meta$points, type = 'n')
+points(pcoa.bc.meta$points[control, ], pch = 17, col = ger.meta.map$bg[control])
+points(pcoa.bc.meta$points[samples, ], pch = 16, col = ger.meta.map$bg[samples])
+```
+
+Make tSNE plots (new alternative ordination strategy)
+```{r}
+library(tsne)
+
+tsne.bc.meta.nc <- tsne(bc.meta.nc)
+plot(tsne.bc.meta.nc, type = 'n')
+points(tsne.bc.meta.nc[control, ], pch = 17, col = ger.meta.map$bg[control])
+points(tsne.bc.meta.nc[samples, ], pch = 16, col = ger.meta.map$bg[samples])
+```
+
+Run some stats to see if space type explains dissimilarity
+```{r}
+adonis(bc.meta.nc ~ ger.meta.map$SpaceTypeBioBE)
+adonis(bc.meta ~ ger.meta.map$SpaceTypeBioBE)
+```
+
+Make heatmaps with and without Propi removed
+```{r}
+## with Propi
+## subset to top 25 taxa
+pick <- order(colSums(ger.meta), decreasing=TRUE)[1:25]
+
+identical(row.names(ger.meta), row.names(ger.meta.map))
+mycol <- mycol.10[match(ger.meta.map$SpaceTypeBioBE, names(mycol.10))]
+
+png('figures/ger_meta_heatmap_top25_genus_withPropi.png', width = 7, height = 6, res = 300, units = 'in', pointsize = 8)
+par(xpd = TRUE)
+heatmap.2(t(ger.meta[,pick]), trace = 'none',
+          col = colorRampPalette(brewer.pal(9, 'YlGnBu'))(100), margin = c(6,10),
+          ColSideColors = mycol,
+          density.info = 'none', 
+          keysize = 1, key.title = '', key.xlab = 'Proportion',
+          labCol = ger.meta.map[row.names(ger.meta), 'Description'],
+          labRow = consensus[colnames(ger.meta[,pick])],
+          xlab = 'Sample', ylab = 'Taxon')
+legend(0.9, 1.1, bty = 'n', cex = 0.7, title = 'Space Type',
+       legend = c('building.support', 'circulation', 'classroom', 'gym', 'laundry', 
+                  'lockers', 'office', 'pool', 'restroom', 'neg.control'),
+       fill = mycol.10, border = 'white')
+dev.off()
+
+## no Propi
+## subset to top 25 taxa
+pick <- order(colSums(ger.meta.nc), decreasing=TRUE)[1:25]
+
+identical(row.names(ger.meta.nc), row.names(ger.meta.map))
+mycol <- mycol.10[match(ger.meta.map$SpaceTypeBioBE, names(mycol.10))]
+
+png('figures/ger_meta_heatmap_top25_genus_noPropi.png', width = 7, height = 6, res = 300, units = 'in', pointsize = 8)
+par(xpd = TRUE)
+heatmap.2(t(ger.meta.nc[,pick]), trace = 'none',
+          col = colorRampPalette(brewer.pal(9, 'YlGnBu'))(100), margin = c(6,10),
+          ColSideColors = mycol,
+          density.info = 'none', 
+          keysize = 1, key.title = '', key.xlab = 'Proportion',
+          labCol = ger.meta.map[row.names(ger.meta.nc), 'Description'],
+          labRow = consensus.nc[colnames(ger.meta.nc[,pick])],
+          xlab = 'Sample', ylab = 'Taxon')
+legend(0.9, 1.1, bty = 'n', cex = 0.7, title = 'Space Type',
+       legend = c('building.support', 'circulation', 'classroom', 'gym', 'laundry', 
+                  'lockers', 'office', 'pool', 'restroom', 'neg.control'),
+       fill = mycol.10, border = 'white')
+dev.off()
+```
+
+Clean up, save data
+```{r}
+rm(top.10, can.meta, con.cum.10, control.taxa.10, i, id, idCol, nmds.can.meta, sam.cum.10, 
+   sample.taxa.10, spaces.counts, x.lim, xbuff, y.lim, ybuff)
+save.image('~/Documents/projects/gerlinger/results/otu_setup/ger_rm_contaminants_meta.RData')
+```

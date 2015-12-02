@@ -71,51 +71,29 @@ res.prop.2$Proportion_Human <- rowSums(res.prop.2[ , c('Proportion_Human.Feces',
 res.prop.2 <- res.prop.2[ , c('Env', 'TITLE', 'SampleID', 
                               'Proportion_Human', 'Proportion_Unknown')]
 
-## density plot of 3 studies
-gg.prop.2.hist <- ggplot(res.prop.2, aes(x = Proportion_Human, fill = TITLE))
-gg.prop.2.hist + geom_density(alpha = 0.6, adjust = 0.75) +
-  # geom_line(stat = 'density', adjust = 0.75) +
-  scale_fill_manual(values = c('darkmagenta', '#FFD701', 'turquoise'),
-                    limits = c('Gerlinger',                                                               
-                               'Athletic equipment microbiota are shaped by interactions with human skin',
-                               'The ecology of microscopic life in household dust'), 
-                    labels = c('Gerlinger',
-                               'Athletic Facilities',
-                               'Homes'),
-                    name = 'Study') +
-  xlim(c(0,1)) +
-  xlab('Proportion of putative human-sourced bacteria') + 
-  ylab('Frequency') +
-  guides(fill = guide_legend(override.aes = list(colour = NULL))) +
-  theme_bw() +
-  theme(legend.key = element_rect(colour = 'black'), legend.background = element_blank(),
-        legend.position = c(1,1), legend.justification = c(1,1))
-ggsave('figures/ger_wood_barberan_sourcetracker_genus_density_fulldata.png', width = 6, height = 6)
-# ggsave('figures/ger_wood_barberan_sourcetracker_genus_density.png', width = 6, height = 6)
-
 ## violin plot of 3 studies
-gg.prop.2.vio <- ggplot(res.prop.2, aes(x = TITLE, y = Proportion_Human, fill = TITLE))
-gg.prop.2.vio + geom_violin(adjust = 0.75) +
-  geom_boxplot(width = 0.1, color = 'black', fill = 'grey70', outlier.color = NA) +
+gg.prop.2.vio <- ggplot(res.prop.2, aes(x = TITLE, y = Proportion_Human, color = TITLE, fill = TITLE))
+gg.prop.2.vio + geom_violin(adjust = 0.75, alpha = 0.3) +
+  geom_boxplot(width = 0.1, aes(fill = TITLE), color = 'black', outlier.color = NA) +
   stat_summary(fun.y = median, geom = 'point', fill = 'white', shape = 21, size = 2.5) +
-  scale_fill_manual(values = c('darkmagenta', '#FFD701', 'turquoise'),
+  scale_fill_manual(values = c('darkmagenta', '#FF3300', '#FF9500'),
                     limits = c('Gerlinger',                                                               
                                'Athletic equipment microbiota are shaped by interactions with human skin',
-                               'The ecology of microscopic life in household dust'), 
-                    labels = c('Gerlinger',
-                               'Athletic Facilities',
-                               'Homes')) +
+                               'The ecology of microscopic life in household dust')) +
+  scale_color_manual(values = c('darkmagenta', '#FF3300', '#FF9500'),
+                    limits = c('Gerlinger',                                                               
+                               'Athletic equipment microbiota are shaped by interactions with human skin',
+                               'The ecology of microscopic life in household dust')) +
   scale_x_discrete(limits = c('Gerlinger',                                                               
                               'Athletic equipment microbiota are shaped by interactions with human skin',
                               'The ecology of microscopic life in household dust'), 
-                   labels = c('Gerlinger',
+                   labels = c('Present Study',
                               'Athletic Facilities\n(Wood et al. 2015)',
                               'Homes\n(Barberan et al. 2015)')) +
   ylab('Proportion of putative human-sourced bacteria') + 
   theme_bw() +
   theme(legend.position = 'none', axis.title.x = element_blank())
-ggsave('figures/ger_wood_barberan_sourcetracker_genus_violin_fulldata.png', width = 8, height = 8)
-# ggsave('figures/ger_wood_barberan_sourcetracker_genus_violin.png', width = 6, height = 6)
+ggsave('figures/ger_wood_barberan_sourcetracker_genus_violin.png', width = 8, height = 8)
 
 ## box plot of 3 studies
 # gg.prop.2.box <- ggplot(res.prop.2, aes(x = TITLE, y = Proportion_Human, fill = TITLE))
@@ -138,3 +116,25 @@ ggsave('figures/ger_wood_barberan_sourcetracker_genus_violin_fulldata.png', widt
 #   ylab('Proportion of putative human-sourced bacteria') +
 #   theme_bw()
 # ggsave('figures/ger_wood_barberan_sourcetracker_genus_boxplot.png', width = 6, height = 8)
+
+## density plot of 3 studies
+# gg.prop.2.hist <- ggplot(res.prop.2, aes(x = Proportion_Human, fill = TITLE))
+# gg.prop.2.hist + geom_density(alpha = 0.6, adjust = 0.75) +
+#   # geom_line(stat = 'density', adjust = 0.75) +
+#   scale_fill_manual(values = c('darkmagenta', '#FFD701', 'turquoise'),
+#                     limits = c('Gerlinger',                                                               
+#                                'Athletic equipment microbiota are shaped by interactions with human skin',
+#                                'The ecology of microscopic life in household dust'), 
+#                     labels = c('Gerlinger',
+#                                'Athletic Facilities',
+#                                'Homes'),
+#                     name = 'Study') +
+#   xlim(c(0,1)) +
+#   xlab('Proportion of putative human-sourced bacteria') + 
+#   ylab('Frequency') +
+#   guides(fill = guide_legend(override.aes = list(colour = NULL))) +
+#   theme_bw() +
+#   theme(legend.key = element_rect(colour = 'black'), legend.background = element_blank(),
+#         legend.position = c(1,1), legend.justification = c(1,1))
+# ggsave('figures/ger_wood_barberan_sourcetracker_genus_density_fulldata.png', width = 6, height = 6)
+# ggsave('figures/ger_wood_barberan_sourcetracker_genus_density.png', width = 6, height = 6)

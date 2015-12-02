@@ -1,4 +1,4 @@
-## Summarize Gerlinger metagenomics data
+## Summarize Gerlinger metagenomics ShortBred data
 ## Roxana Hickey <roxana.hickey@gmail.com
 ## 2015-11-30
 
@@ -57,18 +57,22 @@ all.cat$AbRes_RPKM <- all.ardb.sum[match(names(all.ardb.sum), all.cat$SampleID)]
 theme_set(theme_bw())
 
 ## violin plot of 3 studies
-gg.ardb.vio <- ggplot(all.cat, aes(x = Env, y = AbRes_RPKM, fill = Env))
-gg.ardb.vio + geom_violin(adjust = 0.75) +
-  geom_boxplot(width = 0.1, color = 'black', fill = 'grey70', outlier.color = NA) +
+gg.ardb.vio <- ggplot(all.cat, aes(x = Env, y = AbRes_RPKM, color = Env, fill = Env))
+gg.ardb.vio + geom_violin(adjust = 0.75, alpha = 0.3) +
+  geom_boxplot(width = 0.1, aes(fill = Env), color = 'black', outlier.color = NA) +
   stat_summary(fun.y = median, geom = 'point', fill = 'white', shape = 21, size = 2.5) +
-  scale_fill_manual(values = c('darkmagenta', '#0049FF', '#FF3300'),
+  scale_color_manual(values = c('darkmagenta', '#0049FF', '#00A4DE'),
+                     limits = c('Gerlinger',                                                               
+                                'Built_Environment',
+                                'Human')) +
+  scale_fill_manual(values = c('darkmagenta', '#0049FF', '#00A4DE'),
                     limits = c('Gerlinger',                                                               
                                'Built_Environment',
                                'Human')) +
   scale_x_discrete(limits = c('Gerlinger',                                                               
                               'Built_Environment',
                               'Human'), 
-                   labels = c('Gerlinger',                                                               
+                   labels = c('Present Study',                                                               
                               'Other Built\nEnvironment Studies',
                               'Human Microbiome\nStudies')) +
   scale_y_log10(breaks = trans_breaks('log10', function(x) 10^x),
@@ -89,21 +93,33 @@ colnames(all.ardb.lg) <- c('SampleID', 'Env', 'AbResFam', 'RPKM')
 ## dot plot of all ab res gene families
 gg.ardb.dot <- ggplot(all.ardb.lg, aes(x = AbResFam, y = RPKM, color = Env, 
                                        alpha = Env, shape = Env))
-gg.ardb.dot + geom_point(position = 'jitter') +
-  scale_color_manual(values = c('#FF3300', '#0049FF', 'darkmagenta'),
-                     limits = c('Human', 'Built_Environment', 'Gerlinger'),
-                     labels = c('Human Microbiome',
+gg.ardb.dot + geom_point(position = 'jitter', aes(order = rev(seq(1, nrow(all.ardb.lg))))) +
+  scale_color_manual(name = 'Study',
+                     limits = c('Gerlinger', 'Built_Environment', 'Human'),
+                     labels = c('Present Study',
                                 'Other Built Environments',
-                                'Gerlinger'),
-                     name = 'Study') +
-  scale_alpha_discrete(range = c(0.2, 1), guide = FALSE) +
-  scale_shape_manual(values = c(1, 2, 17), guide = FALSE) +
-  guides(color = guide_legend(reverse = TRUE)) +
+                                'Human Microbiome'),
+                     values = c('darkmagenta', '#0049FF', '#00A4DE')) +
+  scale_shape_manual(name = 'Study',
+                     limits = c('Gerlinger', 'Built_Environment', 'Human'),
+                     labels = c('Present Study',
+                                'Other Built Environments',
+                                'Human Microbiome'),
+                     values = c(17, 2, 1)) +
+  scale_alpha_discrete(name = 'Study',
+                       limits = c('Gerlinger', 'Built_Environment', 'Human'),
+                       labels = c('Present Study',
+                                  'Other Built Environments',
+                                  'Human Microbiome'),
+                       range = rev(c(0.1, 1))) +
   xlab('Antibiotic Resistance Gene Families') +
+  scale_y_log10(breaks = trans_breaks('log10', function(x) 10^x),
+                labels = trans_format('log10', math_format(10^.x))) +
   theme_bw() +
   theme(panel.grid.major.x = element_blank(),
-        axis.text.x = element_blank(), axis.ticks = element_blank())
-ggsave('figures/ger_mbta_hmp_ardb_dot.png', width = 8, height = 6)
+        axis.text.x = element_blank(), axis.ticks = element_blank(),
+        legend.position = 'bottom')
+ggsave('figures/ger_mbta_hmp_ardb_dot_log.png', width = 8, height = 6)
 
 ## summary stats for RPKM
 summary(all.cat$AbRes_RPKM[all.cat$Env == 'Gerlinger'])
