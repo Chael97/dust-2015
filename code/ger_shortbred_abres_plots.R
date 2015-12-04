@@ -11,7 +11,7 @@ library(scales)
 
 ## load OTU table and map file from post-contaminant filtering
 # load('results/otu_setup/ger_otu_setup.RData')
-load('results/otu_setup/ger_rm_contaminants.RData')
+load('results/otu_setup/ger_rm_contaminants_meta.RData')
 
 ## Helpful reminders: 
 ## ger.nc.6500 is the rarefied dataset with contaminants removed, controls retained. samples are in rows.
@@ -29,11 +29,22 @@ hut.cat <- read.table('data/shortbred_ardb/categories_metadata_v2_151130.txt',
                       sep = '\t', header = 1, row.names = NULL)
 
 ## Gerlinger ARDB data
-ger.ardb <- read.table('data/shortbred_ardb/gerlinger_shortbred_merged_ardb.txt',
+ger.ardb <- read.table('data/shortbred_ardb/151203_gerlinger_shortbred_merged_ardb_barcode_sampleid.txt',
                        sep = '\t', header = T, row.names = 1)
 
 ## remove zero-sum samples (no sequence data)
 ger.ardb <- ger.ardb[,colSums(ger.ardb) > 0]
+
+## check if all samples in master sample ID key
+colnames(ger.ardb) %in% sid.key$metaphlan_barcode
+colnames(ger.ardb)[!(colnames(ger.ardb) %in% sid.key$metaphlan_barcode)]
+
+## remove 'undetermined' sample
+ger.ardb[,'Undetermined'] <- NULL
+colnames(ger.ardb) %in% sid.key$metaphlan_barcode
+
+## replace sample IDs to match 16S data
+colnames(ger.ardb) <- sid.key$uparse_sampleid[match(colnames(ger.ardb), sid.key$metaphlan_barcode)]
 
 ## Gerlinger metadata
 ger.cat <- data.frame('SampleID' = colnames(ger.ardb),
@@ -125,3 +136,5 @@ ggsave('figures/ger_mbta_hmp_ardb_dot_log.png', width = 8, height = 6)
 summary(all.cat$AbRes_RPKM[all.cat$Env == 'Gerlinger'])
 summary(all.cat$AbRes_RPKM[all.cat$Env == 'Built_Environment'])
 summary(all.cat$AbRes_RPKM[all.cat$Env == 'Human'])
+
+save.image('~/Documents/projects/gerlinger/results/ger_shortbred_abres_plots.RData')
