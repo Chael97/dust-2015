@@ -142,8 +142,6 @@ for(i in 1:length(spaces)){
 }
 ```
 
-The controls appear to be fairly well separated from the samples (along with a few samples that are in the upper left plot area with the controls), but at first glance no clear differences based on sample type (color) are evident.
-
 Find the 10 most abundant taxa. Use 10 for plotting, and take out those contaminants. Notably in this case, the only bacterial taxa found in the negative control are Propionibacterium (genus) and Propionibacteriaceae (family)
 ```{r}
 ## top 10 taxa
