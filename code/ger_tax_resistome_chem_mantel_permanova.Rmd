@@ -1,16 +1,21 @@
-## Test for associations between community dissimilarity, resistome dissimilarity, and chemical profiles
-## Roxana Hickey <roxana.hickey@gmail.com>
-## Last updated 2015-12-09
+---
+title: "Test for associations between community dissimilarity, resistome dissimilarity, and chemical profiles"
+author: "Roxana Hickey"
+date: "Last updated December 9, 2015"
+output: html_document
+---
 
+## Setup
+```{r}
 library(vegan)
 
 setwd('~/Documents/projects/gerlinger/')
 load('results/otu_setup/ger_rm_contaminants.RData')
 load('results/ger_abres_extra_plots.RData')
+```
 
-####################################
 ## Test taxonomy vs. chem profiles
-####################################
+```{r}
 ## step 1: compute distance/dissimilarity on matrix 1
 ## step 2: plot histogram of dist object ofr matrix 1; transform if necessary and repeat
 ## step 3: compute distance/dissimilarity on matrix 2 
@@ -18,10 +23,10 @@ load('results/ger_abres_extra_plots.RData')
 ## step 5: plot dist 1 against dist 2 to get visual of relationship
 ## step 6: perform Mantel test on dist 1 vs. dist 2
 
-## (prep step) reduce ger.chem to non-NA data
+## (prep) reduce ger.chem to non-NA data
 ger.chem <- na.exclude(ger.map[,c('TCSavg', 'TCCavg', 'MePBavg', 'EtPBavg', 'PrPBavg', 'BuPBavg')])
 
-## (prep step) reduce rarefied otu table to match samples in ger.chem
+## (prep) reduce rarefied otu table to match samples in ger.chem
 ger.nc.rare.mc <- ger.nc.rare[rownames(ger.nc.rare) %in% rownames(ger.chem),] # n = 22
 identical(rownames(ger.nc.rare.mc), rownames(ger.chem))
 
@@ -93,10 +98,10 @@ adonis(bc.nc.mc ~ log(ger.chem$EtPBavg)) ## R2 = 0.06254, p = 0.156 (ns)
 adonis(bc.nc.mc ~ log(ger.chem$MePBavg)) ## R2 = 0.09015, p = 0.06 . (marginally signif)
 adonis(bc.nc.mc ~ log(ger.chem$PrPBavg)) ## R2 = 0.09308, p = 0.045 *
 adonis(bc.nc.mc ~ log(ger.chem$BuPBavg)) ## R2 = 0.08765, p = 0.055 . (marginally signif)
+```
 
-####################################
 ## Test ARDB resistome vs. chem profiles
-####################################
+```{r}
 ## step 1: compute distance/dissimilarity on matrix 1
 ## step 2: plot histogram of dist object ofr matrix 1; transform if necessary and repeat
 ## step 3: compute distance/dissimilarity on matrix 2 
@@ -188,10 +193,10 @@ adonis(gow.ardb.mc ~ ger.chem.2$EtPBavg) ## 0.08669  0.169
 adonis(gow.ardb.mc ~ ger.chem.2$MePBavg) ## 0.11173  0.043 *
 adonis(gow.ardb.mc ~ ger.chem.2$PrPBavg) ## 0.08387  0.177
 adonis(gow.ardb.mc ~ ger.chem.2$BuPBavg) ## 0.08796  0.147
+```
 
-####################################
 ## Test CARD resistome vs. chem profiles
-####################################
+```{r}
 ## step 1: compute distance/dissimilarity on matrix 1
 ## step 2: plot histogram of dist object ofr matrix 1; transform if necessary and repeat
 ## step 3: compute distance/dissimilarity on matrix 2 
@@ -256,10 +261,10 @@ mantel(gow.card.mc, log(dist(ger.chem.2[,'MePBavg']) + 0.0001)) ## ** r = 0.2518
 mantel(gow.card.mc, log(dist(ger.chem.2[,'EtPBavg']) + 0.0001)) ## ns
 mantel(gow.card.mc, log(dist(ger.chem.2[,'PrPBavg']) + 0.0001)) ## ns
 mantel(gow.card.mc, log(dist(ger.chem.2[,'BuPBavg']) + 0.0001)) ## ns
+```
 
-####################################
 ## Test ARDB resistome vs. taxonomy profiles
-####################################
+```{r}
 ger.nc.rare.matchardb <- ger.nc.rare[rownames(ger.nc.rare) %in% colnames(ger.ardb),]
 ger.nc.rare.matchardb <- ger.nc.rare.matchardb[match(rownames(t(ger.ardb)), rownames(ger.nc.rare.matchardb)),]
 
@@ -283,10 +288,10 @@ plot(vegdist(ger.nc.rare.matchardb, method = 'canberra'),
 
 mantel(vegdist(ger.nc.rare.matchardb, method = 'canberra'), 
        vegdist(t(ger.ardb), method = 'gower')) ## * r = 0.2844, p = 0.025
+```
 
-####################################
 ## Test CARD resistome vs. taxonomy profiles
-####################################
+```{r}
 ger.nc.rare.matchcard <- ger.nc.rare[rownames(ger.nc.rare) %in% colnames(ger.card),]
 ger.nc.rare.matchcard <- ger.nc.rare.matchcard[match(rownames(t(ger.card)), rownames(ger.nc.rare.matchcard)),]
 
@@ -311,3 +316,4 @@ plot(vegdist(ger.nc.rare.matchcard, method = 'canberra'),
 
 mantel(vegdist(ger.nc.rare.matchcard, method = 'canberra'), 
        vegdist(t(ger.card), method = 'gower')) ## r = 0.2677, p = 0.026 *
+```
