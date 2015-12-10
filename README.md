@@ -1,2 +1,2 @@
-# Gerlinger study
-Analysis of dust samples collected from Gerlinger Hall, a mixed-use athletic facility on the University of Oregon campus.
+# Microbiome and antimicrobials found in dust
+Analysis of the microbiome and antimicrobials from dust samples collected from a mixed-use athletic facility.
