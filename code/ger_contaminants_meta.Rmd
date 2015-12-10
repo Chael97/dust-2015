@@ -2,7 +2,9 @@
 title: "Look for contamination in Gerlinger metagenomics MetaPhlAn data"
 author: "Roxana Hickey"
 date: "Last updated December 9, 2015"
-output: html_document
+output: 
+  html_document: 
+    keep_md: yes
 ---
 
 Adapted from analysis by James Meadow for human microbial cloud study (original script [here](https://github.com/jfmeadow/Meadow_HumanMicrobialCloud_Analysis/blob/master/manuscript_code/contamination/pb_contamination.md)).
