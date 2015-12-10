@@ -1,4 +1,4 @@
-## Perform exploratory ecological analysis on taxonomic data
+## Perform exploratory analysis on antibiotic resistome data
 ## Roxana Hickey <roxana.hickey@gmail.com>
 ## Last updated 2015-12-09
 
@@ -15,6 +15,8 @@ library(gplots)
 load('results/otu_setup/ger_rm_contaminants_meta.RData')
 load('~/Documents/projects/gerlinger/results/ger_shortbred_abres_plots.RData')
 
+## Note: it may not make sense to apply ecological distance metrics to gene abundance data.
+## PROCEED WITH CAUTION. TO BE REVISITED AT A LATER DATE...
 ## pcoa based on ARDB genes
 bc.ardb <- vegdist(t(ger.ardb))
 pcoa.bc.ardb <- cmdscale(bc.ardb, eig = TRUE)
