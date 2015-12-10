@@ -1,0 +1,313 @@
+## Test for associations between community dissimilarity, resistome dissimilarity, and chemical profiles
+## Roxana Hickey <roxana.hickey@gmail.com>
+## Last updated 2015-12-09
+
+library(vegan)
+
+setwd('~/Documents/projects/gerlinger/')
+load('results/otu_setup/ger_rm_contaminants.RData')
+load('results/ger_abres_extra_plots.RData')
+
+####################################
+## Test taxonomy vs. chem profiles
+####################################
+## step 1: compute distance/dissimilarity on matrix 1
+## step 2: plot histogram of dist object ofr matrix 1; transform if necessary and repeat
+## step 3: compute distance/dissimilarity on matrix 2 
+## step 4: plot histogram of dist object ofr matrix 2; transform if necessary and repeat
+## step 5: plot dist 1 against dist 2 to get visual of relationship
+## step 6: perform Mantel test on dist 1 vs. dist 2
+
+## (prep step) reduce ger.chem to non-NA data
+ger.chem <- na.exclude(ger.map[,c('TCSavg', 'TCCavg', 'MePBavg', 'EtPBavg', 'PrPBavg', 'BuPBavg')])
+
+## (prep step) reduce rarefied otu table to match samples in ger.chem
+ger.nc.rare.mc <- ger.nc.rare[rownames(ger.nc.rare) %in% rownames(ger.chem),] # n = 22
+identical(rownames(ger.nc.rare.mc), rownames(ger.chem))
+
+## steps 1-2: compute bray-curtis diss on otu table; view distribution
+bc.nc.mc <- vegdist(ger.nc.rare.mc)
+can.nc.mc <- vegdist(ger.nc.rare.mc, method = 'canberra')
+
+# png('figures/ger_tax_bc_vs_can_diss.png', width = 8, height = 6, units = 'in')
+par(mfrow = c(1,2))
+hist(bc.nc.mc, breaks = 10, main = 'Bray-Curtis(taxonomy)', 
+     xlab = 'Pairwise Bray-Curtis dissimilarity', col = mycol.9[9]) ## somewhat bimodal
+hist(can.nc.mc, breaks = 10, main = 'Canberra(taxonomy)', 
+     xlab = 'Pairwise Canberra dissimilarity', col = mycol.9[9]) ## roughly normal
+# dev.off()
+
+## steps 3-4: compute euclidean distance matrix on ger.chem; view distribution
+euc.chem <- dist(ger.chem)
+hist(euc.chem, breaks = 10, main = 'dist(chemical profile)', 
+     xlab = 'Pairwise Euclidean distance', col = mycol.9[9]) ## weighted toward low dist
+
+euc.chem.log <- log(dist(ger.chem)) ## transform dist(raw [chem])
+hist(euc.chem.log, breaks = 10, main = 'log[dist(chemical profile)]', 
+     xlab = 'log(pairwise Euclidean distance)', col = mycol.9[9]) ## roughly normal
+
+par(mfrow = c(2,3))
+for(i in c('TCSavg', 'TCCavg', 'MePBavg', 'EtPBavg', 'PrPBavg', 'BuPBavg')){
+  hist(log(dist(ger.chem[,i])), breaks = 10, col = mycol.9[9], 
+       main = paste0('log[dist(', i, ')]'), 
+       xlab = paste0('log Euclidean distance'))} ## mostly normal
+# dev.off()
+
+## step 5a: plot taxonomy against chem profile distance (all)
+par(mfrow = c(1,1))
+plot(can.nc.mc ~ euc.chem.log, col = mycol.9[9],
+     ylab = 'Canberra dissimilarity of taxonomy profiles',
+     xlab = 'log Euclidean distance of chemical profiles')
+
+## step 6a: mantel test (all chem)
+mantel(can.nc.mc, euc.chem.log) ## r = 0.2075, p = 0.074
+
+## step 5b: plot taxonomy against chem profile distance (individual)
+par(mfrow = c(2,3))
+for(i in c('TCSavg', 'TCCavg', 'MePBavg', 'EtPBavg', 'PrPBavg', 'BuPBavg')){
+  ger.dist.tmp <- log(dist(ger.chem[,i]))
+  plot(can.nc.mc ~ ger.dist.tmp, main = i, col = mycol.9[9],
+       ylab = 'Canberra dissimilarity of taxonomy profiles',
+       xlab = paste0('log Euclidean distance of [chemical]'))}
+# dev.off()
+
+## step 6b: mantel test (individual chem); need to add marginal amount to dist prior to log 
+mantel(can.nc.mc, log(dist(ger.chem[,'TCSavg']) + 0.0001)) ## ns
+mantel(can.nc.mc, log(dist(ger.chem[,'TCCavg']) + 0.0001)) ## r = 0.2389, p usually > 0.05
+mantel(can.nc.mc, log(dist(ger.chem[,'MePBavg']) + 0.0001)) ## ns
+mantel(can.nc.mc, log(dist(ger.chem[,'EtPBavg']) + 0.0001)) ## ns
+mantel(can.nc.mc, log(dist(ger.chem[,'PrPBavg']) + 0.0001)) ## ns
+mantel(can.nc.mc, log(dist(ger.chem[,'BuPBavg']) + 0.0001)) ## ns
+
+## extra: PERMANOVA tests
+adonis(can.nc.mc ~ log(ger.chem$TCSavg)) ## R2 = 0.07157, p = 0.022 *
+adonis(can.nc.mc ~ log(ger.chem$TCCavg)) ## R2 = 0.0594, p = 0.118 (ns)
+adonis(can.nc.mc ~ log(ger.chem$EtPBavg)) ## R2 = 0.06908, p = 0.021 *
+adonis(can.nc.mc ~ log(ger.chem$MePBavg)) ## R2 = 0.07697, p = 0.007 **
+adonis(can.nc.mc ~ log(ger.chem$PrPBavg)) ## R2 = 0.08092, p = 0.004 **
+adonis(can.nc.mc ~ log(ger.chem$BuPBavg)) ## R2 = 0.07886, p = 0.008 **
+
+adonis(bc.nc.mc ~ log(ger.chem$TCSavg)) ## R2 = 0.07307, p = 0.106 (ns)
+adonis(bc.nc.mc ~ log(ger.chem$TCCavg)) ## R2 = 0.09499,  p = 0.052 . (marginally signif)
+adonis(bc.nc.mc ~ log(ger.chem$EtPBavg)) ## R2 = 0.06254, p = 0.156 (ns)
+adonis(bc.nc.mc ~ log(ger.chem$MePBavg)) ## R2 = 0.09015, p = 0.06 . (marginally signif)
+adonis(bc.nc.mc ~ log(ger.chem$PrPBavg)) ## R2 = 0.09308, p = 0.045 *
+adonis(bc.nc.mc ~ log(ger.chem$BuPBavg)) ## R2 = 0.08765, p = 0.055 . (marginally signif)
+
+####################################
+## Test ARDB resistome vs. chem profiles
+####################################
+## step 1: compute distance/dissimilarity on matrix 1
+## step 2: plot histogram of dist object ofr matrix 1; transform if necessary and repeat
+## step 3: compute distance/dissimilarity on matrix 2 
+## step 4: plot histogram of dist object ofr matrix 2; transform if necessary and repeat
+## step 5: plot dist 1 against dist 2 to get visual of relationship
+## step 6: perform Mantel test on dist 1 vs. dist 2
+
+## (prep step) reduce ardb to match ger.chem
+ger.ardb.mc <- ger.ardb[,colnames(ger.ardb) %in% rownames(ger.chem)] ## n = 18
+
+## (prep step) reduce chem to match ger.ardb.mc
+ger.chem.2 <- ger.chem[rownames(ger.chem) %in% colnames(ger.ardb.mc),]
+ger.chem.2 <- ger.chem.2[match(rownames(t(ger.ardb.mc)), rownames(ger.chem.2)),]
+
+identical(rownames(t(ger.ardb.mc)), rownames(ger.chem.2))
+
+## steps 1-2: compute diss on ARDB table; view distribution
+bc.ardb.mc <- vegdist(t(ger.ardb.mc))
+euc.ardb.mc <- dist(t(ger.ardb.mc))
+can.ardb.mc <- vegdist(t(ger.ardb.mc), method = 'canberra')
+jac.ardb.mc <- vegdist(t(ger.ardb.mc), method = 'jaccard')
+gow.ardb.mc <- vegdist(t(ger.ardb.mc), method = 'gower')
+horn.ardb.mc <- vegdist(t(ger.ardb.mc), method = 'horn')
+
+# png('figures/ger_ardb_dist_comparison.png', width = 8, height = 6, units = 'in', res = 300)
+par(mfrow = c(2,3))
+hist(bc.ardb.mc, breaks = 10, main = 'Bray-Curtis(ARDB resistome)', 
+     xlab = 'Pairwise Bray-Curtis dissimilarity', col = mycol.9[9]) ## skewed left tail
+hist(euc.ardb.mc, breaks = 10, main = 'Euclidean(ARDB resistome)', 
+     xlab = 'Pairwise Euclidean distance', col = mycol.9[9]) ## roughly normal, but gappy
+hist(can.ardb.mc, breaks = 10, main = 'Canberra(ARDB resistome)', 
+     xlab = 'Pairwise Canberra distance', col = mycol.9[9]) ## skewed left tail
+hist(jac.ardb.mc, breaks = 10, main = 'Jaccard(ARDB resistome)', 
+     xlab = 'Pairwise Jaccard distance', col = mycol.9[9]) ## skewed left tail
+hist(gow.ardb.mc, breaks = 10, main = 'Gower(ARDB resistome)', 
+     xlab = 'Pairwise Gower distance', col = mycol.9[9]) ## roughly normal
+hist(horn.ardb.mc, breaks = 10, main = 'Horn-Morisita(ARDB resistome)', 
+     xlab = 'Pairwise Horn-Morisita distance', col = mycol.9[9]) ## skewed/bimodal
+# dev.off()
+
+## steps 3-4: compute euclidean distance matrix on ger.chem; view distribution
+par(mfrow = c(1,2))
+euc.chem.2 <- dist(ger.chem.2)
+hist(euc.chem.2, breaks = 10, main = 'dist(chemical profile)', 
+     xlab = 'Pairwise Euclidean distance', col = mycol.9[9]) ## weighted toward low dist
+
+euc.chem.2.log <- log(dist(ger.chem.2)) ## transform dist(raw [chem])
+hist(euc.chem.2.log, breaks = 10, main = 'log[dist(chemical profile)]', 
+     xlab = 'log(pairwise Euclidean distance)', col = mycol.9[9]) ## roughly normal
+
+par(mfrow = c(2,3))
+for(i in c('TCSavg', 'TCCavg', 'MePBavg', 'EtPBavg', 'PrPBavg', 'BuPBavg')){
+  hist(log(dist(ger.chem.2[,i])), breaks = 10, col = mycol.9[9], 
+       main = paste0('log[dist(', i, ')]'), 
+       xlab = paste0('log Euclidean distance'))} ## mostly normal
+# dev.off()
+
+## step 5a: plot ARDB resistome against chem profile distance (all)
+par(mfrow = c(1,1))
+plot(gow.ardb.mc ~ euc.chem.2.log, col = mycol.9[9],
+     ylab = 'Gower dissimilarity of ARDB resistome profiles',
+     xlab = 'log Euclidean distance of chemical profiles')
+
+## step 6a: mantel test (all chem)
+mantel(gow.ardb.mc, euc.chem.2.log) ## * r = 0.4521, p = 0.015
+
+## step 5b: plot ARDB resistome against chem profile distance (individual)
+par(mfrow = c(2,3))
+for(i in c('TCSavg', 'TCCavg', 'MePBavg', 'EtPBavg', 'PrPBavg', 'BuPBavg')){
+  ger.dist.tmp <- log(dist(ger.chem.2[,i]))
+  plot(gow.ardb.mc ~ ger.dist.tmp, main = i, col = mycol.9[9],
+       ylab = 'Gower dissimilarity of ARDB resistome',
+       xlab = paste0('log Euclidean distance of [chemical]'))}
+# dev.off()
+
+## step 6b: mantel test (individual chem); need to add marginal amount to dist prior to log 
+mantel(gow.ardb.mc, log(dist(ger.chem.2[,'TCSavg']) + 0.0001)) ## ns
+mantel(gow.ardb.mc, log(dist(ger.chem.2[,'TCCavg']) + 0.0001)) ## * r = 0.492, p = 0.012
+mantel(gow.ardb.mc, log(dist(ger.chem.2[,'MePBavg']) + 0.0001)) ## . r = 0.1531, p = 0.054
+mantel(gow.ardb.mc, log(dist(ger.chem.2[,'EtPBavg']) + 0.0001)) ## ns
+mantel(gow.ardb.mc, log(dist(ger.chem.2[,'PrPBavg']) + 0.0001)) ## ns
+mantel(gow.ardb.mc, log(dist(ger.chem.2[,'BuPBavg']) + 0.0001)) ## ns
+
+## bonus round: PERMANOVA
+adonis(vegdist(t(ger.ardb), method = 'gower') ~ ger.meta.map.nc$SpaceTypeBioBE) ## 0.34438  0.011 *
+adonis(gow.ardb.mc ~ ger.chem.2$TCCavg) ## 0.11164  0.119
+adonis(gow.ardb.mc ~ ger.chem.2$TCSavg) ## 0.11718  0.127
+adonis(gow.ardb.mc ~ ger.chem.2$EtPBavg) ## 0.08669  0.169
+adonis(gow.ardb.mc ~ ger.chem.2$MePBavg) ## 0.11173  0.043 *
+adonis(gow.ardb.mc ~ ger.chem.2$PrPBavg) ## 0.08387  0.177
+adonis(gow.ardb.mc ~ ger.chem.2$BuPBavg) ## 0.08796  0.147
+
+####################################
+## Test CARD resistome vs. chem profiles
+####################################
+## step 1: compute distance/dissimilarity on matrix 1
+## step 2: plot histogram of dist object ofr matrix 1; transform if necessary and repeat
+## step 3: compute distance/dissimilarity on matrix 2 
+## step 4: plot histogram of dist object ofr matrix 2; transform if necessary and repeat
+## step 5: plot dist 1 against dist 2 to get visual of relationship
+## step 6: perform Mantel test on dist 1 vs. dist 2
+
+## (prep step) reduce card to match ger.chem
+ger.card.mc <- ger.card[,colnames(ger.card) %in% rownames(ger.chem)] ## n = 18
+identical(rownames(t(ger.card.mc)), rownames(ger.chem.2))
+
+## steps 1-2: compute dissimilarity on CARD table; view distribution
+bc.card.mc <- vegdist(t(ger.card.mc))
+euc.card.mc <- dist(t(ger.card.mc))
+can.card.mc <- vegdist(t(ger.card.mc), method = 'canberra')
+jac.card.mc <- vegdist(t(ger.card.mc), method = 'jaccard')
+gow.card.mc <- vegdist(t(ger.card.mc), method = 'gower')
+horn.card.mc <- vegdist(t(ger.card.mc), method = 'horn')
+
+# png('figures/ger_card_dist_comparison.png', width = 8, height = 6, units = 'in', res = 300)
+par(mfrow = c(2,3))
+hist(bc.card.mc, breaks = 10, main = 'Bray-Curtis(CARD resistome)', 
+     xlab = 'Pairwise Bray-Curtis dissimilarity', col = mycol.9[9]) ## skewed left tail
+hist(euc.card.mc, breaks = 10, main = 'Euclidean(CARD resistome)', 
+     xlab = 'Pairwise Euclidean distance', col = mycol.9[9]) ## normal left, skewed right tail
+hist(can.card.mc, breaks = 10, main = 'Canberra(CARD resistome)', 
+     xlab = 'Pairwise Canberra distance', col = mycol.9[9]) ## slighly skewed left tail
+hist(jac.card.mc, breaks = 10, main = 'Jaccard(CARD resistome)', 
+     xlab = 'Pairwise Jaccard distance', col = mycol.9[9]) ## skewed left tail
+hist(gow.card.mc, breaks = 10, main = 'Gower(CARD resistome)', 
+     xlab = 'Pairwise Gower distance', col = mycol.9[9]) ## roughly normal
+hist(horn.card.mc, breaks = 10, main = 'Horn-Morisita(CARD resistome)', 
+     xlab = 'Pairwise Horn-Morisita distance', col = mycol.9[9]) ## highly skewed; don't use
+# dev.off()
+
+## steps 3-4: done in previous step for ARDB
+
+## step 5a: plot CARD resistome against chem profile distance (all)
+par(mfrow = c(1,1))
+plot(gow.card.mc ~ euc.chem.2.log, col = mycol.9[9],
+     ylab = 'Gower dissimilarity of CARD resistomes',
+     xlab = 'log Euclidean distance of chemical profiles')
+
+## step 6a: mantel test (all chem)
+mantel(gow.card.mc, euc.chem.2.log) ## * r = 0.4593, p = 0.016
+mantel(euc.card.mc, euc.chem.2.log) ## ns
+mantel(can.card.mc, euc.chem.2.log) ## * r = 0.2418, p = 0.014
+
+## step 5b: plot CARD resistome against chem profile distance (individual)
+par(mfrow = c(2,3))
+for(i in c('TCSavg', 'TCCavg', 'MePBavg', 'EtPBavg', 'PrPBavg', 'BuPBavg')){
+  ger.dist.tmp <- log(dist(ger.chem.2[,i]))
+  plot(gow.card.mc ~ ger.dist.tmp, main = i, col = mycol.9[9],
+       ylab = 'Gower dissimilarity of CARD resistomes',
+       xlab = paste0('log Euclidean distance of [chemical]'))}
+# dev.off()
+
+## step 6b: mantel test (individual chem); need to add marginal amount to dist prior to log 
+mantel(gow.card.mc, log(dist(ger.chem.2[,'TCSavg']) + 0.0001)) ## * r = 0.3976, p = 0.025
+mantel(gow.card.mc, log(dist(ger.chem.2[,'TCCavg']) + 0.0001)) ## * r = 0.4889, p = 0.011
+mantel(gow.card.mc, log(dist(ger.chem.2[,'MePBavg']) + 0.0001)) ## ** r = 0.2518, p = 0.002
+mantel(gow.card.mc, log(dist(ger.chem.2[,'EtPBavg']) + 0.0001)) ## ns
+mantel(gow.card.mc, log(dist(ger.chem.2[,'PrPBavg']) + 0.0001)) ## ns
+mantel(gow.card.mc, log(dist(ger.chem.2[,'BuPBavg']) + 0.0001)) ## ns
+
+####################################
+## Test ARDB resistome vs. taxonomy profiles
+####################################
+ger.nc.rare.matchardb <- ger.nc.rare[rownames(ger.nc.rare) %in% colnames(ger.ardb),]
+ger.nc.rare.matchardb <- ger.nc.rare.matchardb[match(rownames(t(ger.ardb)), rownames(ger.nc.rare.matchardb)),]
+
+identical(rownames(ger.nc.rare.matchardb), rownames(t(ger.ardb)))
+
+# png('figures/tax_vs_ardb_hist.png', width = 6, height = 6, units = 'in', res = 300)
+par(mfrow = c(1,2))
+hist(vegdist(ger.nc.rare.matchardb, method = 'canberra'), breaks = 10, main = 'Canberra(taxonomy)', 
+     xlab = 'Pairwise Canberra distance', col = mycol.9[9]) ## roughly normal
+hist(vegdist(t(ger.ardb), method = 'gower'), breaks = 10, main = 'Gower(ARDB resistome)', 
+     xlab = 'Pairwise Gower dissimilarity', col = mycol.9[9]) ## roughly normal
+# dev.off()
+
+# png('figures/tax_vs_ardb_dist.png', width = 6, height = 6, units = 'in', res = 300)
+par(mfrow = c(1,1))
+plot(vegdist(ger.nc.rare.matchardb, method = 'canberra'),
+     vegdist(t(ger.ardb), method = 'gower'), col = mycol.9[9],
+     xlab = '16S rRNA taxonomy pairwise Canberra distance',
+     ylab = 'ARDB resistome pairwise Gower dissimilarity')
+# dev.off()
+
+mantel(vegdist(ger.nc.rare.matchardb, method = 'canberra'), 
+       vegdist(t(ger.ardb), method = 'gower')) ## * r = 0.2844, p = 0.025
+
+####################################
+## Test CARD resistome vs. taxonomy profiles
+####################################
+ger.nc.rare.matchcard <- ger.nc.rare[rownames(ger.nc.rare) %in% colnames(ger.card),]
+ger.nc.rare.matchcard <- ger.nc.rare.matchcard[match(rownames(t(ger.card)), rownames(ger.nc.rare.matchcard)),]
+
+identical(rownames(ger.nc.rare.matchcard), rownames(t(ger.card)))
+
+# png('figures/tax_vs_card_hist.png', width = 6, height = 6, units = 'in', res = 300)
+par(mfrow = c(1,1))
+par(mfrow = c(1,2))
+hist(vegdist(ger.nc.rare.matchcard, method = 'canberra'), breaks = 10, main = 'Canberra(taxonomy)', 
+     xlab = 'Pairwise Canberra distance', col = mycol.9[9]) ## roughly normal
+hist(vegdist(t(ger.card), method = 'gower'), breaks = 10, main = 'Gower(CARD resistome)', 
+     xlab = 'Pairwise Gower dissimilarity', col = mycol.9[9]) ## roughly normal
+# dev.off()
+
+# png('figures/tax_vs_card_dist.png', width = 6, height = 6, units = 'in', res = 300)
+par(mfrow = c(1,1))
+plot(vegdist(ger.nc.rare.matchcard, method = 'canberra'),
+     vegdist(t(ger.card), method = 'gower'), col = mycol.9[9],
+     xlab = '16S rRNA taxonomy pairwise Canberra distance',
+     ylab = 'CARD resistome pairwise Gower dissimilarity')
+# dev.off()
+
+mantel(vegdist(ger.nc.rare.matchcard, method = 'canberra'), 
+       vegdist(t(ger.card), method = 'gower')) ## r = 0.2677, p = 0.026 *
