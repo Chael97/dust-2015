@@ -48,6 +48,10 @@ colnames(ger.ardb) <- sid.key$uparse_sampleid[match(colnames(ger.ardb), sid.key$
 ## remove duplicate samples
 ger.ardb <- ger.ardb[, colnames(ger.ardb) %in% rownames(ger.meta)]
 
+## read in key with more informative AbRes class labels
+ardb.fam.id <- as.data.frame(read.table('data/shortbred_ardb/ARDB_family_descriptions.txt', 
+                                        header = T, sep = '\t'))
+
 ## Gerlinger metadata
 ger.cat <- data.frame('SampleID' = colnames(ger.ardb),
                       'SampleType' = rep('Indoor', length(colnames(ger.ardb))),
@@ -145,14 +149,34 @@ ger.ardb.2plus$SampleID <- rownames(ger.ardb.2plus)
 ger.ardb.2plus.lg <- melt(ger.ardb.2plus, id.vars = 'SampleID')
 colnames(ger.ardb.2plus.lg) <- c('SampleID', 'AbResFam', 'RPKM')
 
-gg.ardb.ger.dot <- ggplot(ger.ardb.2plus.lg, aes(x = AbResFam, y = RPKM, color = AbResFam))
-gg.ardb.ger.dot + geom_point(alpha = 0.5, color = 'darkmagenta', shape = 17, 
-                             aes(order = rev(seq(1, nrow(ger.ardb.2plus.lg))))) +
-  xlab('Antibiotic Resistance Gene Family') +
+## add more informative AbRes names
+ger.ardb.2plus.lg$AbResFamClass <- ardb.fam.id$Class[match(ger.ardb.2plus.lg$AbResFam, ardb.fam.id$Family)]
+ger.ardb.2plus.lg$AbResFamClass2 <- paste0(ger.ardb.2plus.lg$AbResFamClass, ' (', ger.ardb.2plus.lg$AbResFam, ')')
+
+ardb.fam.id.2plus <- ardb.fam.id[ardb.fam.id$Family %in% ger.ardb.2plus.lg$AbResFam,]
+
+## plot wrt AbRes family
+gg.ardb.ger.dot.f <- ggplot(ger.ardb.2plus.lg, aes(x = AbResFam, y = RPKM, color = AbResFamClass))
+gg.ardb.ger.dot.f + geom_jitter(alpha = 0.7, position = position_jitter(width = 0.1),
+                                aes(shape = AbResFamClass)) +
+  xlab('ARDB Gene Family') +
+  scale_x_discrete(limits = ardb.fam.id.2plus$Family[order(ardb.fam.id.2plus$Class)]) +
+  scale_shape_manual(values = c(16,15,17,16,15,17,16,15,17,16,15,17,16)) +
   theme_bw() +
-  theme(panel.grid.major.x = element_blank(),
-        axis.text.x = element_text(angle = 45, hjust = 1))
-ggsave('figures/ger_ardb_dot.png', width = 10, height = 8)
+  guides(color = guide_legend(title = 'ARDB Gene Class'),
+         shape = guide_legend(title = 'ARDB Gene Class')) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+ggsave('figures/ger_ardb_dot_family.png', width = 12, height = 7)
+
+## plot wrt AbRes class
+gg.ardb.ger.dot.c <- ggplot(ger.ardb.2plus.lg, aes(x = AbResFamClass, y = RPKM))
+gg.ardb.ger.dot.c + geom_jitter(alpha = 0.5, color = 'darkmagenta', shape = 17, 
+                                position = position_jitter(width = 0.2),
+                                aes(order = rev(seq(1, nrow(ger.ardb.2plus.lg))))) +
+  xlab('ARDB Gene Class') +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+ggsave('figures/ger_ardb_dot_class.png', width = 8, height = 6)
 
 ## summary stats for RPKM
 summary(all.cat$AbRes_RPKM[all.cat$Env == 'Gerlinger'])
