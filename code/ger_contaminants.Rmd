@@ -1,7 +1,7 @@
 ---
 title: "Look for contamination in Gerlinger 16S rRNA data"
 author: "Roxana Hickey"
-date: "November 4, 2015"
+date: "Last updated December 9, 2015"
 output: html_document
 ---
 
@@ -39,11 +39,15 @@ ger.map.orig$SampleID <- row.names(ger.map.orig)
 ## reduce mapping file to oneuL samples
 ger.map <- ger.map.orig[grep('oneuL', row.names(ger.map.orig)), ]
 
-## define samples to ignore due to low read count or from another study
-sample.ignore <- c('oneuL3031',
-                   row.names(ger)[grep('oneuLP', row.names(ger))],
-                   row.names(ger)[grep('oneuLC', row.names(ger))],
-                   row.names(ger)[grep('oneuLFT', row.names(ger))])
+## define samples to ignore due to duplication, low read count or from another study
+sample.ignore <- c('oneuL120a1', 'oneuL120a2', 'oneuL125a1', 'oneuL1402', ## duplicates
+                   'oneuL1404', 'oneuL3301', 'oneuLh2412', 'oneuLs2101',  ## duplicates
+                   'oneuL3031', ## low read count
+                   row.names(ger)[grep('oneuLP', row.names(ger))], ## different study
+                   row.names(ger)[grep('oneuLC', row.names(ger))], ## different study
+                   row.names(ger)[grep('oneuLFT', row.names(ger))]) ## different study
+
+## total number of samples represented: 43/44 + 2 controls = 45 altogether
 
 ## make reduced OTU table
 ger <- ger[!(row.names(ger) %in% sample.ignore),]
@@ -114,14 +118,14 @@ consensus[1:10]
 
 Some indexing and metadata stuff for figures and such.
 ```{r}
-ger.map$pch <- 21
+ger.map$pch <- 17
 table(ger.map$SpaceTypeBioBE)
 
 control <- which(ger.map$SpaceTypeBioBE == 'neg.control')
 samples <- which(ger.map$SpaceTypeBioBE != 'neg.control')
 
 spaces <- unique(ger.map$SpaceTypeBioBE)
-spaces <- spaces[-11]
+spaces <- spaces[-11] ## exclude neg.control from space types
 
 spaces.counts <- list()
 for(i in 1:length(spaces)){
@@ -130,14 +134,7 @@ for(i in 1:length(spaces)){
 }
 
 ger.map$pch2 <- ger.map$pch
-ger.map$pch2[ger.map$SpaceTypeBioBE == 'neg.control'] <- 24
-
-# mycol.11 <- c('#A6CEE3', '#1F78B4', '#B2DF8A', '#33A02C', '#FB9A99', '#E31A1C', 
-              # '#FDBF6F', '#FF7F00', '#CAB2D6', '#6A3D9A', '#B15928')
-
-## custom color palette (http://www.r-bloggers.com/the-paul-tol-21-color-salute/)
-# mycol.10 <- c("#332288", "#88CCEE", "#44AA99", "#117733", "#999933", 
-              # "#DDCC77", "#661100", "#CC6677", "#882255", "#AA4499")
+ger.map$pch2[ger.map$SpaceTypeBioBE == 'neg.control'] <- 16
 
 ## custom color palette
 mycol.10 <- c("#0000A9", "#0049FF", "#00A4DE", "turquoise", "chartreuse3", 
@@ -152,32 +149,55 @@ for(i in 1:length(spaces)){
 }
 ```
 
-Make dissimilarity matrix; this may take a while. Make with both Canberra and Bray-Curtis, and then make NMDS ordinations. The Bray-Curtis will be more useful for identifying the influence of the most abundant taxa, while Canberra is used for analysis. Here, Canberra has high stress, so is not used much. Also quick plot to make sure that BC captures differences between groups.
-```{r}
+Make dissimilarity matrix with both Canberra and Bray-Curtis, and then make NMDS and PCoA ordinations. The Bray-Curtis will be more useful for identifying the influence of the most abundant taxa, while Canberra has more often used for analysis in previous studies. Here, Canberra has high stress, so is not used much. Also quick plot to make sure that BC captures differences between groups.
+```{r fig.width = 12, fig.height = 6}
 can <- vegdist(ger.10K, 'canberra')
 bc <- vegdist(ger.10K)
 
+## NMDS
 nmds.can <- nmds(can)
 nmds.bc <- nmds(bc)
 
-plot(nmds.can$points, col = ger.map$SpaceTypeBioBE, type = "n")
+par(mfrow = c(1,2))
+plot(nmds.can$points, col = ger.map$SpaceTypeBioBE, type = "n",
+     main = 'NMDS (Canberra)', xlab = 'NMDS 1', ylab = 'NMDS 2')
 points(nmds.can$points[control, ], pch = 17, col = ger.map$bg[control])
 for(i in 1:length(spaces)){
   points(nmds.can$points[spaces.counts[[i]], ], 
          pch = 16, col = ger.map$bg[spaces.counts[[i]]])
 }
 
-plot(nmds.bc$points, col = ger.map$SpaceTypeBioBE, type = "n")
+plot(nmds.bc$points, col = ger.map$SpaceTypeBioBE, type = "n",
+     main = 'NMDS (Bray-Curtis)', xlab = 'NMDS 1', ylab = 'NMDS 2')
 points(nmds.bc$points[control, ], pch = 17, col = ger.map$bg[control])
 for(i in 1:length(spaces)){
   points(nmds.bc$points[spaces.counts[[i]], ], 
          pch = 16, col = ger.map$bg[spaces.counts[[i]]])
 }
+
+## PCoA
+pcoa.can <- cmdscale(can, eig = TRUE)
+pcoa.bc <- cmdscale(bc, eig = TRUE)
+
+par(mfrow = c(1,2))
+plot(pcoa.can$points, col = ger.map$SpaceTypeBioBE, type = "n",
+     main = 'PCoA (Canberra)', xlab = 'PCoA 1', ylab = 'PCoA 2')
+points(pcoa.can$points[control, ], pch = 17, col = ger.map$bg[control])
+for(i in 1:length(spaces)){
+  points(pcoa.can$points[spaces.counts[[i]], ], 
+         pch = 16, col = ger.map$bg[spaces.counts[[i]]])
+}
+
+plot(pcoa.bc$points, col = ger.map$SpaceTypeBioBE, type = "n",
+     main = 'PCoA (Bray-Curtis)', xlab = 'PCoA 1', ylab = 'PCoA 2')
+points(pcoa.bc$points[control, ], pch = 17, col = ger.map$bg[control])
+for(i in 1:length(spaces)){
+  points(pcoa.bc$points[spaces.counts[[i]], ], 
+         pch = 16, col = ger.map$bg[spaces.counts[[i]]])
+}
 ```
 
-The controls appear to be fairly well separated from the samples (along with a few samples that are in the upper left plot area with the controls), but at first glance no clear differences based on sample type (color) are evident.
-
-Find the most abundant taxa. This is done for 10, 100, 1000. Use 10 for plotting, and take out those contaminants, but use 1000 since some contaminants are really rare in actual samples.
+The controls appear to be fairly well separated from the samples, but at first glance no clear differences based on sample type (color) are evident. Next, find the ten most abundant taxa.
 ```{r}
 ## top 10 taxa
 control.taxa.10 <- rev(sort(colSums(ger.10K[control, ])))[1:10]/sum(ger.10K[control, ])
@@ -191,57 +211,12 @@ top.10 <- cbind(rev(control.taxa.10), rev(sample.taxa.10))
 
 con.cum.10 <- cumsum(rev(control.taxa.10))
 sam.cum.10 <- cumsum(rev(sample.taxa.10))
-
-## top 100
-control.taxa.100 <- rev(sort(colSums(ger.10K[control, ])))[1:100]/sum(ger.10K[control, ])
-sample.taxa.100 <- rev(sort(colSums(ger.10K[-control, ])))[1:100]/sum(ger.10K[-control, ])
-
-control.taxa.100['other'] <- 1 - sum(control.taxa.100)
-sample.taxa.100['other'] <- 1 - sum(sample.taxa.100)
-
-top.100 <- cbind(rev(control.taxa.100), rev(sample.taxa.100))
-
-con.cum.100 <- cumsum(rev(control.taxa.100))
-sam.cum.100 <- cumsum(rev(sample.taxa.100))
-
-## top 1000
-control.taxa.1000 <- rev(sort(colSums(ger.10K[control, ])))[1:1000]/sum(ger.10K[control, ])
-sample.taxa.1000 <- rev(sort(colSums(ger.10K[-control, ])))[1:1000]/sum(ger.10K[-control, ])
-
-control.taxa.1000['other'] <- 1 - sum(control.taxa.1000)
-sample.taxa.1000['other'] <- 1 - sum(sample.taxa.1000)
-
-top.1000 <- cbind(rev(control.taxa.1000), rev(sample.taxa.1000))
-
-con.cum.1000 <- cumsum(rev(control.taxa.1000))
-sam.cum.1000 <- cumsum(rev(sample.taxa.1000))
 ```
 
-Halomonas is abundant in both the controls and samples and causes a big jump in the cumulative sum. Shewanella is also consistently elevated in both controls along with 4 samples but is not one of the most abundant taxa overall.
-```{r}
-rev(sort(colSums(ger.10K)))[1:10] # Halomonas is #2 in list
-rev(sort(colSums(ger.10K)))[2]/sum(ger.10K) # 5.8%
-
-halo <- grep('Halomonadaceae', row.names(taxo), ignore.case = TRUE) # top Halomonas is #1 in list
-taxo[halo, ]
-
-ger.10K[, halo[1]] # only #1 and #4 are prevalent in controls
-
-haloCol <- ger.10K[, halo[1]]
-
-plot(haloCol ~ nmds.bc$points[, 1], type = "n", xlab = 'NMDS 1', ylab = 'Halomonadaceae reads')
-points(haloCol[control] ~ nmds.bc$points[control, 1], pch = 21, bg = ger.map$bg[control])
-for(i in 1:length(spaces)){
-  points(haloCol[spaces.counts[[i]]] ~ nmds.bc$points[spaces.counts[[i]], 1], 
-         pch = 16, col = ger.map$bg[spaces.counts[[i]]])
-}
-```
-
-Although there are 5 OTUs matching 'Halomonadaceae', only one (the first in the halo list) is highly abundant.
-
-Big panel figure showing each top contaminant in the dataset and its influence on NMDS1.
-```{r}
-pdf('~/Documents/projects/gerlinger/figures/contaminationTop10.pdf', height=10, width=10, useDingbats=TRUE)
+Big panel figure showing each top contaminant in the dataset and its influence on first axis of NMDS or PCoA:
+```{r fig.width = 10, fig.height = 12}
+## NMDS
+# pdf('~/Documents/projects/gerlinger/figures/contaminationTop10_nmds_bc.pdf', height=10, width=10, useDingbats=TRUE)
 layout(matrix(c(11:15, 1:10, 16:20), 5, 4), 
        heights = c(1, 1, 1, 1, 1.5), 
        widths = c(1, 2, 2, 1))
@@ -295,128 +270,207 @@ for (i in 1:10) {
     # mtext(paste(consensus[id], " (", id, ")", sep = ""), line = -1.5)
     mtext(consensus[id], line = -1.5)
 }
-dev.off()
+# dev.off()
+
+## PCoA
+# pdf('~/Documents/projects/gerlinger/figures/contaminationTop10_pcoa_bc.pdf', height=10, width=10, useDingbats=TRUE)
+layout(matrix(c(11:15, 1:10, 16:20), 5, 4), 
+       heights = c(1, 1, 1, 1, 1.5), 
+       widths = c(1, 2, 2, 1))
+par(las = 1, mar = c(0, 4, 0, 0), fg = "gray40", col.axis = "gray40", col.lab = "gray40")
+for (i in 1:10) {
+    id <- names(control.taxa.10)[i]
+    print(taxo[id, ])
+    idCol <- ger.10K.ra[, id]
+    print(sum(idCol)/sum(ger.10K.ra))
+    y.lim <- round(range(idCol), 2)
+    ybuff <- y.lim[2]/8
+    x.lim <- round(range(pcoa.bc$points[, 1]), 2)
+    xbuff <- sum(abs(x.lim))/8
+
+    if (i %in% c(1:4)) {
+        par(las = 1, mar = c(0, 4, 0, 0))
+    }
+    if (i %in% c(5:8)) {
+        par(las = 1, mar = c(0, 0, 0, 4))
+    }
+    if (i == 5) {
+        par(las = 1, mar = c(4, 4, 0, 0))
+    }
+    if (i == 10) {
+        par(las = 1, mar = c(4, 0, 0, 4))
+    }
+    plot(idCol ~ pcoa.bc$points[, 1], ylim = c(y.lim + c(-ybuff, 2 * ybuff)), 
+        xlim = c(x.lim + c(-xbuff, xbuff)), type = "n", xaxt = "n", yaxt = "n", 
+        xlab = "", ylab = "")
+    if (i %in% c(1:5)) {
+        yax <- 2
+    } else {
+        yax <- 4
+    }
+    axis(side = yax, at = y.lim, labels = TRUE)
+    if (i %in% c(5, 10)) {
+        axis(side = 1, at = x.lim)
+        mtext("PCoA 1", side = 1, line = 1, cex = 0.7)
+    }
+    if (i == 1) {
+        mtext("relative\nabundance", side = 2, cex = 0.7, line = 0.5)
+    }
+    if (i == 6) {
+        mtext("relative\nabundance", side = 4, cex = 0.7, line = 0.5)
+    }
+    points(idCol[control] ~ pcoa.bc$points[control, 1], pch = 17, col = ger.map$bg[control])
+    for(i in 1:length(spaces)){
+      points(idCol[spaces.counts[[i]]] ~ pcoa.bc$points[spaces.counts[[i]], 1], 
+             pch = 16, col = ger.map$bg[spaces.counts[[i]]])
+    }
+    # mtext(paste(consensus[id], " (", id, ")", sep = ""), line = -1.5)
+    mtext(consensus[id], line = -1.5)
+}
+# dev.off()
 ```
 
-```{r}
-for (i in 11:2) {
-    xup <- xdown <- yup <- ydown <- NULL
+Halomonas and Shewanella are both abundant in the controls and also in one sample. This could be skewing the first PCoA/NMDS axis, so we'll remove those as probably contaminants. Exigubacterium is somewhat abundant in the controls but not in any samples, so we can safely ignore it. Other taxa are present in low abundance in controls and higher abundance in samples (e.g. Enterobacteriaceae), so those are likely not contaminants. Therefore, we will remove Halomonadaceae and Shewanella as likely contaminants but leave all other taxa intact.
+```{r fig.width = 12, fig.height = 6}
+rev(sort(colSums(ger.10K)))[1:10]
 
-    yup <- rep(con.cum.10[i], 2)
-    ydown <- rep(con.cum.10[i - 1], 2)
-    xup <- xdown <- c(1, 2)
+halo <- grep('Halomonadaceae', row.names(taxo), ignore.case = TRUE) # top Halomonas is #1 in list
+taxo[halo, ]
 
-    if (names(con.cum.10)[i] %in% names(sam.cum.1000)) {
-        ucu <- which(names(sam.cum.1000) == names(con.cum.10)[i])
-        yup <- c(yup, rep(sam.cum.1000[ucu], 2))
-        ydown <- c(ydown, rep(sam.cum.1000[ucu - 1], 2))
-        xup <- xdown <- c(xup, 3, 4)
-    }
-    if (names(con.cum.10)[i] %in% names(con.cum.1000)) {
-        ocu <- which(names(con.cum.1000) == names(con.cum.10)[i])
-        yup <- c(yup, rep(con.cum.1000[ocu], 2))
-        ydown <- c(ydown, rep(con.cum.1000[ocu - 1], 2))
-        xup <- xdown <- c(xup, 5, 6)
-    }
-    par(mar = c(3, 3, 3, 3))
-    if (i %in% c(7, 2)) {
-        par(mar = c(8, 3, 3, 3))
-    }
-    barplot(top.10, col = c("gray30", rep("gray93", 10)), border = "gray30", 
-        space = 1, yaxt = "n")
-    if (i %in% c(7, 2)) {
-        par(las = 2)
-        mtext(c("control", "sample"), side = 1, at = c(1.5, 
-            3.5), cex = 0.8, line = 0.2)
-    }
-    par(las = 1)
-    if (!i %in% c(7, 2)) {
-        par(las = 2)
-        mtext(c("c", "s"), side = 1, at = c(1.5, 3.5), cex = 0.8, 
-            line = 0.2)
-    }
-    par(las = 1)
-    if (i %in% 11:7) {
-        axis(2, at = c(0, 0.5, 1), labels = c(0, 50, 100))
-    }
-    if (i %in% 2:6) {
-        axis(4, at = c(0, 0.5, 1), labels = c(0, 50, 100))
-    }
-    polygon(c(xup, rev(xdown)), c(yup, rev(ydown)), col = rgb(0, 0, 0, 0.3))
+ger.10K[, halo[1]] # only #1 and #4 are prevalent in controls
+
+haloCol <- ger.10K[, halo[1]]
+
+par(mfrow = c(1,2))
+plot(haloCol ~ nmds.bc$points[, 1], type = "n", xlab = 'NMDS 1', ylab = 'Halomonadaceae reads')
+points(haloCol[control] ~ nmds.bc$points[control, 1], pch = 17, bg = ger.map$bg[control])
+for(i in 1:length(spaces)){
+  points(haloCol[spaces.counts[[i]]] ~ nmds.bc$points[spaces.counts[[i]], 1], 
+         pch = 16, col = ger.map$bg[spaces.counts[[i]]])
+}
+
+shew <- grep('Shewanella', row.names(taxo), ignore.case = TRUE)
+taxo[shew, ]
+
+ger.10K[, shew] # only #1 and #4 are prevalent in controls
+
+shewCol <- ger.10K[, shew]
+
+plot(shewCol ~ nmds.bc$points[, 1], type = "n", xlab = 'NMDS 1', ylab = 'Shewenalla reads')
+points(shewCol[control] ~ nmds.bc$points[control, 1], pch = 17, bg = ger.map$bg[control])
+for(i in 1:length(spaces)){
+  points(shewCol[spaces.counts[[i]]] ~ nmds.bc$points[spaces.counts[[i]], 1], 
+         pch = 16, col = ger.map$bg[spaces.counts[[i]]])
 }
 ```
 
-Now take out those most abundant in pcr controls.
-```{r}
+Check out the NMDS and PCoA after taking out contaminants.
+```{r, width = 8, fig.height = 8}
 dim(ger)
 
-ger.nc <- ger[, -which(colnames(ger) %in% names(control.taxa.10[1]))]
+ger.nc <- ger[, -which(colnames(ger) %in% names(control.taxa.10[c(1,3)]))]
+
+bc.nc <- vegdist(ger.nc)
+can.nc <- vegdist(ger.nc, method = 'canberra')
+
+nmds.bc.nc <- nmds(bc.nc)
+
+plot(nmds.bc.nc$points, type = 'n', xlab = 'NMDS 1', ylab = 'NMDS 2')
+text(nmds.bc.nc$points[control, 2] ~ nmds.bc.nc$points[control, 1],
+     labels = rownames(nmds.bc.nc$points[control, ]), col = ger.map$bg[control])
+text(nmds.bc.nc$points[samples, 2] ~ nmds.bc.nc$points[samples, 1],
+     labels = rownames(nmds.bc.nc$points[samples, ]), col = ger.map$bg[samples])
+
+pcoa.bc.nc <- cmdscale(bc.nc, eig = TRUE)
+
+plot(pcoa.bc.nc$points, type = 'n', xlab = 'PCoA 1', ylab = 'PCoA 2')
+text(pcoa.bc.nc$points[control, 2] ~ pcoa.bc.nc$points[control, 1],
+     labels = rownames(pcoa.bc.nc$points[control, ]), col = ger.map$bg[control])
+text(pcoa.bc.nc$points[samples, 2] ~ pcoa.bc.nc$points[samples, 1],
+     labels = rownames(pcoa.bc.nc$points[samples, ]), col = ger.map$bg[samples])
 
 sort(rowSums(ger.nc))
+```
 
-ger.nc.6500 <- rrarefy(ger.nc, 6500)
-ger.nc.6500 <- ger.nc.6500[, -which(colSums(ger.nc.6500) == 0)]
-ger.6500 <- rrarefy(ger, 6500)
-ger.6500 <- ger.6500[, -which(colSums(ger.6500) == 0)]
+Based on the NMDS and read counts, sample 'oneuL1201' is similar to the controls and has far fewer read counts than the rest of the samples. The controls are also well separated from the rest of the samples (i.e. their composition is different). Therefore, we will exclude the two controls and 
+```{r}
+## save OTU table and map table with all samples
+ger.nc.all <- ger.nc
+ger.map.all <- ger.map
 
-taxo.nc <- makeTaxo(ger.tax[ger.tax %in% colnames(ger.nc.6500)], ger.nc.6500)
+## write new OTU table and map table excluding controls and oneuL1201
+ger.nc <- ger.nc.all[-which(rownames(ger.nc.all) %in% c('oneuL1201', 'oneuLcontroL1', 'oneuLcontroL2')), ]
+
+ger.map <- ger.map.all[-which(rownames(ger.map.all) %in% c('oneuL1201', 'oneuLcontroL1', 'oneuLcontroL2')), ]
+
+## rarefy
+sort(rowSums(ger.nc)) ## minimum is 16,447
+
+ger.nc.rare <- rrarefy(ger.nc, 16000)
+ger.nc.rare <- ger.nc.rare[, -which(colSums(ger.nc.rare) == 0)]
+# ger.rare <- rrarefy(ger, 16000)
+# ger.rare <- ger.rare[, -which(colSums(ger.rare) == 0)]
+
+taxo.nc <- makeTaxo(ger.tax[ger.tax %in% colnames(ger.nc.rare)], ger.nc.rare)
 consensus.nc <- apply(taxo.nc[, 1:6], 1, cons)
 ```
 
 Make same NMDS objects to compare.
-```{r}
-bc.nc <- vegdist(ger.nc.6500)
-bc <- vegdist(ger.6500)
+```{r fig.width = 12, fig.height = 6}
+bc.nc <- vegdist(ger.nc.rare)
+can.nc <- vegdist(ger.nc.rare, method = 'canberra')
+# bc <- vegdist(ger.rare)
 
 nmds.bc.nc <- nmds(bc.nc)
-nmds.bc <- nmds(bc)
+# nmds.bc <- nmds(bc)
 
-plot(nmds.bc.nc$points, type = 'n')
-points(nmds.bc.nc$points[control, ], pch = 17, col = ger.map$bg[control])
-points(nmds.bc.nc$points[samples, ], pch = 16, col = ger.map$bg[samples])
+par(mfrow = c(1,2))
+plot(nmds.bc$points, type = 'n', main = 'Full dataset rarefied to 10K', 
+     xlab = 'NMDS 1', ylab = 'NMDS 2')
+points(nmds.bc$points[control, ], pch = 17, col = ger.map.all$bg[control])
+points(nmds.bc$points[samples, ], pch = 16, col = ger.map.all$bg[samples])
 
-plot(nmds.bc$points, type = 'n')
-points(nmds.bc$points[control, ], pch = 17, col = ger.map$bg[control])
-points(nmds.bc$points[samples, ], pch = 16, col = ger.map$bg[samples])
-
-plot(bc.nc, bc)
+plot(nmds.bc.nc$points, type = 'n', main = 'Reduced dataset rarefied to 16K', 
+     xlab = 'NMDS 1', ylab = 'NMDS 2')
+points(nmds.bc.nc$points, pch = 16, col = ger.map$bg)
 ```
 
 Compare PCoA plots
-```{r}
+```{r fig.width = 12, fig.height = 6}
 pcoa.bc.nc <- cmdscale(bc.nc, eig = TRUE)
-pcoa.bc <- cmdscale(bc, eig = TRUE)
 
-plot(pcoa.bc.nc$points, type = 'n')
-points(pcoa.bc.nc$points[control, ], pch = 17, col = ger.map$bg[control])
-points(pcoa.bc.nc$points[samples, ], pch = 16, col = ger.map$bg[samples])
+par(mfrow = c(1,2))
+plot(pcoa.bc$points, type = 'n', main = 'Full dataset rarefied to 10K', 
+     xlab = 'PCoA 1', ylab = 'PCoA 2')
+points(pcoa.bc$points[control, ], pch = 17, col = ger.map.all$bg[control])
+points(pcoa.bc$points[samples, ], pch = 16, col = ger.map.all$bg[samples])
 
-plot(pcoa.bc$points, type = 'n')
-points(pcoa.bc$points[control, ], pch = 17, col = ger.map$bg[control])
-points(pcoa.bc$points[samples, ], pch = 16, col = ger.map$bg[samples])
-```
-
-Make tSNE plots (new alternative ordination strategy)
-```{r}
-library(tsne)
-
-tsne.bc.nc <- tsne(bc.nc)
-plot(tsne.bc.nc, type = 'n')
-points(tsne.bc.nc[control, ], pch = 17, col = ger.map$bg[control])
-points(tsne.bc.nc[samples, ], pch = 16, col = ger.map$bg[samples])
+plot(pcoa.bc.nc$points, type = 'n', main = 'Reduced dataset rarefied to 16K', 
+     xlab = 'PCoA 1', ylab = 'PCoA 2')
+points(pcoa.bc.nc$points, pch = 16, col = ger.map$bg)
 ```
 
 Run some stats to see if space type explains dissimilarity
 ```{r}
-adonis(bc.nc ~ ger.map$SpaceTypeBioBE)
-adonis(bc ~ ger.map$SpaceTypeBioBE)
+adonis(bc.nc ~ ger.map$SpaceTypeBioBE) ## R2 = 0.28471, p = 0.004 **
+adonis(can.nc ~ ger.map$SpaceTypeBioBE) ## R2 = 0.22885,  p = 0.006 **
+```
+
+Loose ends: calculate PCoA 'variance explained', reduce color palette
+```{r}
+## Use ape::pcoa to obtain R^2-like ratios
+pcoa.rval <- ape::pcoa(vegdist(ger.nc.rare))
+
+## R^2-like ratio for first two axes
+pcoa.rval$values$Rel_corr_eig[1:2]
+
+## reduce mycol.10 to mycol.9 (neg control no longer needed)
+mycol.9 <- mycol.10[-10]
 ```
 
 Clean up, save data
 ```{r}
-rm(ger.10K.ra, ger.10K, top.10, top.100, top.1000, can, con.cum.10, con.cum.100, con.cum.1000,
-   control.taxa.10, control.taxa.100, control.taxa.1000, halo, haloCol, i, id, idCol, mito, nmds.can,
-   ocu, plants, sam.cum.10, sam.cum.100, sam.cum.1000, sample.ignore, sample.taxa.10, sample.taxa.100,
-   sample.taxa.1000, spaces.counts, ucu, x.lim, xbuff, xdown, xup, y.lim, yax, ybuff, ydown, yup)
+rm(ger.10K.ra, ger.10K, top.10, can, con.cum.10, control.taxa.10, halo, haloCol, shew, shewCol, i, mito, nmds.can, 
+  plants, sam.cum.10, sample.ignore, sample.taxa.10, spaces.counts)
 save.image('~/Documents/projects/gerlinger/results/otu_setup/ger_rm_contaminants.RData')
 ```

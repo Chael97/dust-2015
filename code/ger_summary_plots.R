@@ -1,5 +1,5 @@
 ## Perform exploratory ecological analysis on taxonomic data
-## 2015-10-27
+## Last updated 2015-12-09
 ## Roxana Hickey <roxana.hickey@gmail.com>
 
 setwd('~/Documents/projects/gerlinger/')
@@ -16,9 +16,9 @@ library(gplots)
 load('results/otu_setup/ger_rm_contaminants.RData')
 
 ## Helpful reminders: 
-## ger.nc.6500 is the rarefied dataset with contaminants removed, controls retained. samples are in rows.
-## taxo.nc and consensus.nc are the taxonomic labels and short names for the rarefied dataset (ger.nc.6500)
-## bc.nc is the Bray-curtis dissimilarity matrix based on ger.nc.6500
+## ger.nc.rare is the rarefied dataset (depth = 16,000) with contaminants and controls removed. samples are in rows.
+## taxo.nc and consensus.nc are the taxonomic labels and short names for the rarefied dataset (ger.nc.rare)
+## bc.nc is the Bray-curtis dissimilarity matrix based on ger.nc.rare
 ## pcoa.bc.nc is the corresponding PCoA object to bc.nc
 
 ####################################
@@ -31,7 +31,7 @@ ger.nc.prop <- prop.table(ger.nc, margin = 1)
 pick <- order(colSums(ger.nc.prop), decreasing=TRUE)[1:25]
 
 identical(row.names(ger.nc.prop), row.names(ger.map))
-mycol <- mycol.10[match(ger.map$SpaceTypeBioBE, names(mycol.10))]
+mycol <- mycol.9[match(ger.map$SpaceTypeBioBE, names(mycol.9))]
 
 png('figures/ger_heatmap_top25_genus.png', width = 7, height = 6, res = 300, units = 'in', pointsize = 8)
 par(xpd = TRUE)
@@ -45,20 +45,20 @@ heatmap.2(t(ger.nc.prop[,pick]), trace = 'none',
           xlab = 'Sample', ylab = 'Taxon')
 legend(0.9, 1.1, bty = 'n', cex = 0.7, title = 'Space Type',
        legend = c('building.support', 'circulation', 'classroom', 'gym', 'laundry', 
-                  'lockers', 'office', 'pool', 'restroom', 'neg.control'),
-       fill = mycol.10, border = 'white')
+                  'lockers', 'office', 'pool', 'restroom'),
+       fill = mycol.9, border = 'white')
 dev.off()
 
-png('figures/ger_heatmap_top25_genus_v2.png', width = 7, height = 6, res = 300, units = 'in', pointsize = 8)
-heatmap.2(t(ger.nc.prop[,pick]), trace = 'none',
-          col = colorRampPalette(brewer.pal(9, 'YlGnBu'))(100), margin = c(6,10),
-          # ColSideColors = mycol,
-          density.info = 'none', 
-          keysize = 1, key.title = '', key.xlab = 'Proportion',
-          labCol = ger.map[row.names(ger.nc.prop), 'Description'],
-          labRow = consensus.nc[colnames(ger.nc.prop[,pick])],
-          xlab = 'Sample', ylab = 'Taxon')
-dev.off()
+# png('figures/ger_heatmap_top25_genus_v2.png', width = 7, height = 6, res = 300, units = 'in', pointsize = 8)
+# heatmap.2(t(ger.nc.prop[,pick]), trace = 'none',
+#           col = colorRampPalette(brewer.pal(9, 'YlGnBu'))(100), margin = c(6,10),
+#           # ColSideColors = mycol,
+#           density.info = 'none', 
+#           keysize = 1, key.title = '', key.xlab = 'Proportion',
+#           labCol = ger.map[row.names(ger.nc.prop), 'Description'],
+#           labRow = consensus.nc[colnames(ger.nc.prop[,pick])],
+#           xlab = 'Sample', ylab = 'Taxon')
+# dev.off()
 
 ####################################
 ## plot Bray-Curtis PCoA
@@ -66,10 +66,6 @@ df.pcoa.bc.nc <- as.data.frame(pcoa.bc.nc$points)
 colnames(df.pcoa.bc.nc) <- c('PCoA1', 'PCoA2')
 df.pcoa.bc.nc$SampleID <- rownames(df.pcoa.bc.nc)
 df.pcoa.bc.nc.all <- merge(df.pcoa.bc.nc, ger.map)
-
-## specify 12 colors for space types --> use mycol.10 for updated space types
-# mycol.12 <- c('#A6CEE3', '#1F78B4', '#B2DF8A', '#33A02C', '#FB9A99', '#E31A1C', 
-              # '#FDBF6F', '#FF7F00', '#CAB2D6', '#6A3D9A', '#EEEE00', '#B15928')
 
 ## set theme_bw
 theme_set(theme_bw())
@@ -79,9 +75,9 @@ gg.pcoa.bc.nc <- ggplot(df.pcoa.bc.nc.all, aes(x = PCoA1, y = PCoA2, color = Spa
 gg.pcoa.bc.nc + geom_point(size = 3) +
   # ggtitle('PCoA on Bray-Curtis') +
   geom_text(aes(y = PCoA2 + 0.01, label = Description), size = 3, vjust = 0) + 
-  scale_color_manual(values = mycol.10, name = 'Space Type',
+  scale_color_manual(values = mycol.9, name = 'Space Type',
                      breaks = c('building.support', 'circulation', 'classroom', 'gym', 'laundry', 
-                                'lockers', 'office', 'pool', 'restroom', 'neg.control'))
+                                'lockers', 'office', 'pool', 'restroom'))
 ggsave('figures/pcoa_bc_g_sampletype.png', width = 8, height = 6.5, units = 'in')
 
 ####################################
@@ -96,9 +92,9 @@ gg.nmds.bc.nc <- ggplot(df.nmds.bc.nc.all, aes(x = NMDS1, y = NMDS2, color = Spa
 gg.nmds.bc.nc + geom_point(size = 3) +
   # ggtitle('NMDS on Bray-Curtis') +
   geom_text(aes(y = NMDS2 + 0.01, label = Description), size = 3, vjust = 0) + 
-  scale_color_manual(values = mycol.10, name = 'Space Type',
+  scale_color_manual(values = mycol.9, name = 'Space Type',
                      breaks = c('building.support', 'circulation', 'classroom', 'gym', 'laundry', 
-                                'lockers', 'office', 'pool', 'restroom', 'neg.control'))
+                                'lockers', 'office', 'pool', 'restroom'))
 ggsave('figures/nmds_bc_g_sampletype.png', width = 8, height = 6.5, units = 'in')
 
 ####################################
@@ -111,9 +107,9 @@ gg.pcoa.bc.nc +
              size = 2, pch = 1, na.rm = FALSE) +
   geom_point() + 
   scale_size_continuous(range = c(3,8), name = 'Crack Area') +
-  scale_color_manual(values = mycol.10, name = 'Space Type',
+  scale_color_manual(values = mycol.9, name = 'Space Type',
                      breaks = c('building.support', 'circulation', 'classroom', 'gym', 'laundry', 
-                                'lockers', 'office', 'pool', 'restroom', 'neg.control'))
+                                'lockers', 'office', 'pool', 'restroom'))
 ggsave('figures/pcoa_bc_g_crackarea.png', width = 8, height = 6.5, units = 'in')
 
 ## chem = TCSavg  
@@ -123,9 +119,9 @@ gg.pcoa.bc.nc +
              aes(x = PCoA1, y = PCoA2), 
              size = 2, pch = 1) +
   geom_point() + 
-  scale_color_manual(values = mycol.10, name = 'Space Type',
+  scale_color_manual(values = mycol.9, name = 'Space Type',
                      breaks = c('building.support', 'circulation', 'classroom', 'gym', 'laundry', 
-                                'lockers', 'office', 'pool', 'restroom', 'neg.control')) +
+                                'lockers', 'office', 'pool', 'restroom')) +
   scale_size_continuous(range = c(3,8), name = 'Triclosan')
 ggsave('figures/pcoa_bc_g_TCSavg.png', width = 8, height = 6.5, units = 'in')
 
@@ -136,10 +132,10 @@ gg.pcoa.bc.nc +
              aes(x = PCoA1, y = PCoA2), 
              size = 2, pch = 1) +
   geom_point() + 
-  scale_color_manual(values = mycol.10, name = 'Space Type',
+  scale_color_manual(values = mycol.9, name = 'Space Type',
                      breaks = c('building.support', 'circulation', 'classroom', 'gym', 'laundry', 
-                                'lockers', 'office', 'pool', 'restroom', 'neg.control')) +
-  scale_size_continuous(range = c(3,8), name = 'Trichlorocarbanilide')
+                                'lockers', 'office', 'pool', 'restroom')) +
+  scale_size_continuous(range = c(3,8), name = 'Triclocarban')
 ggsave('figures/pcoa_bc_g_TCCavg.png', width = 8, height = 6.5, units = 'in')
 
 ## chem = MePBavg  
@@ -149,9 +145,9 @@ gg.pcoa.bc.nc +
              aes(x = PCoA1, y = PCoA2), 
              size = 2, pch = 1) +
   geom_point() + 
-  scale_color_manual(values = mycol.10, name = 'Space Type',
+  scale_color_manual(values = mycol.9, name = 'Space Type',
                      breaks = c('building.support', 'circulation', 'classroom', 'gym', 'laundry', 
-                                'lockers', 'office', 'pool', 'restroom', 'neg.control')) +
+                                'lockers', 'office', 'pool', 'restroom')) +
   scale_size_continuous(range = c(3,8), name = 'Methylparaben')
 ggsave('figures/pcoa_bc_g_MePBavg.png', width = 8, height = 6.5, units = 'in')
 
@@ -162,9 +158,9 @@ gg.pcoa.bc.nc +
              aes(x = PCoA1, y = PCoA2), 
              size = 2, pch = 1) +
   geom_point() + 
-  scale_color_manual(values = mycol.10, name = 'Space Type',
+  scale_color_manual(values = mycol.9, name = 'Space Type',
                      breaks = c('building.support', 'circulation', 'classroom', 'gym', 'laundry', 
-                                'lockers', 'office', 'pool', 'restroom', 'neg.control')) +
+                                'lockers', 'office', 'pool', 'restroom')) +
   scale_size_continuous(range = c(3,8), name = 'Ethylparaben')
 ggsave('figures/pcoa_bc_g_EtPBavg.png', width = 8, height = 6.5, units = 'in')
 
@@ -175,9 +171,9 @@ gg.pcoa.bc.nc +
              aes(x = PCoA1, y = PCoA2), 
              size = 2, pch = 1) +
   geom_point() + 
-  scale_color_manual(values = mycol.10, name = 'Space Type',
+  scale_color_manual(values = mycol.9, name = 'Space Type',
                      breaks = c('building.support', 'circulation', 'classroom', 'gym', 'laundry', 
-                                'lockers', 'office', 'pool', 'restroom', 'neg.control')) +
+                                'lockers', 'office', 'pool', 'restroom')) +
   scale_size_continuous(range = c(3,8), name = 'Propylparaben')
 ggsave('figures/pcoa_bc_g_PrPBavg.png', width = 8, height = 6.5, units = 'in')
 
@@ -188,8 +184,8 @@ gg.pcoa.bc.nc +
              aes(x = PCoA1, y = PCoA2), 
              size = 2, pch = 1) +
   geom_point() + 
-  scale_color_manual(values = mycol.10, name = 'Space Type',
+  scale_color_manual(values = mycol.9, name = 'Space Type',
                      breaks = c('building.support', 'circulation', 'classroom', 'gym', 'laundry', 
-                                'lockers', 'office', 'pool', 'restroom', 'neg.control')) +
+                                'lockers', 'office', 'pool', 'restroom')) +
   scale_size_continuous(range = c(3,8), name = 'Butylparaben')
 ggsave('figures/pcoa_bc_g_BuPBavg.png', width = 8, height = 6.5, units = 'in')
