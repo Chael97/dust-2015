@@ -376,6 +376,7 @@ bc.nc <- vegdist(ger.nc)
 can.nc <- vegdist(ger.nc, method = 'canberra')
 
 nmds.bc.nc <- nmds(bc.nc)
+nmds.bc.nc <- nmds(can.nc)
 
 plot(nmds.bc.nc$points, type = 'n', xlab = 'NMDS 1', ylab = 'NMDS 2')
 text(nmds.bc.nc$points[control, 2] ~ nmds.bc.nc$points[control, 1],
@@ -384,6 +385,7 @@ text(nmds.bc.nc$points[samples, 2] ~ nmds.bc.nc$points[samples, 1],
      labels = rownames(nmds.bc.nc$points[samples, ]), col = ger.map$bg[samples])
 
 pcoa.bc.nc <- cmdscale(bc.nc, eig = TRUE)
+pcoa.can.nc <- cmdscale(can.nc, eig = TRUE)
 
 plot(pcoa.bc.nc$points, type = 'n', xlab = 'PCoA 1', ylab = 'PCoA 2')
 text(pcoa.bc.nc$points[control, 2] ~ pcoa.bc.nc$points[control, 1],
@@ -424,6 +426,7 @@ can.nc <- vegdist(ger.nc.rare, method = 'canberra')
 # bc <- vegdist(ger.rare)
 
 nmds.bc.nc <- nmds(bc.nc)
+nmds.can.nc <- nmds(can.nc)
 # nmds.bc <- nmds(bc)
 
 par(mfrow = c(1,2))
@@ -461,10 +464,11 @@ adonis(can.nc ~ ger.map$SpaceTypeBioBE) ## R2 = 0.22885,  p = 0.006 **
 Loose ends: calculate PCoA 'variance explained', reduce color palette
 ```{r}
 ## Use ape::pcoa to obtain R^2-like ratios
-pcoa.rval <- ape::pcoa(vegdist(ger.nc.rare))
+pcoa.bc.rval <- ape::pcoa(vegdist(ger.nc.rare))
+pcoa.bc.rval$values$Rel_corr_eig[1:2]
 
-## R^2-like ratio for first two axes
-pcoa.rval$values$Rel_corr_eig[1:2]
+pcoa.can.rval <- ape::pcoa(vegdist(ger.nc.rare, method = 'canberra'))
+pcoa.can.rval$values$Rel_corr_eig[1:2]
 
 ## reduce mycol.10 to mycol.9 (neg control no longer needed)
 mycol.9 <- mycol.10[-10]

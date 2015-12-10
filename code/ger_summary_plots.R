@@ -19,6 +19,7 @@ load('results/otu_setup/ger_rm_contaminants.RData')
 ## ger.nc.rare is the rarefied dataset (depth = 16,000) with contaminants and controls removed. samples are in rows.
 ## taxo.nc and consensus.nc are the taxonomic labels and short names for the rarefied dataset (ger.nc.rare)
 ## bc.nc is the Bray-curtis dissimilarity matrix based on ger.nc.rare
+## can.nc is the Canberra dissimilarity matrix based on ger.nc.rare
 ## pcoa.bc.nc is the corresponding PCoA object to bc.nc
 
 ####################################
@@ -189,3 +190,133 @@ gg.pcoa.bc.nc +
                                 'lockers', 'office', 'pool', 'restroom')) +
   scale_size_continuous(range = c(3,8), name = 'Butylparaben')
 ggsave('figures/pcoa_bc_g_BuPBavg.png', width = 8, height = 6.5, units = 'in')
+
+####################################
+## plot Canberra PCoA
+df.pcoa.can.nc <- as.data.frame(pcoa.can.nc$points)
+colnames(df.pcoa.can.nc) <- c('PCoA1', 'PCoA2')
+df.pcoa.can.nc$SampleID <- rownames(df.pcoa.can.nc)
+df.pcoa.can.nc.all <- merge(df.pcoa.can.nc, ger.map)
+
+## set theme_bw
+theme_set(theme_bw())
+
+## all samples by space type
+gg.pcoa.can.nc <- ggplot(df.pcoa.can.nc.all, aes(x = PCoA1, y = PCoA2, color = SpaceTypeBioBE))
+gg.pcoa.can.nc + geom_point(size = 3) +
+  # ggtitle('PCoA on Canberra') +
+  geom_text(aes(y = PCoA2 + 0.01, label = Description), size = 3, vjust = 0) + 
+  scale_color_manual(values = mycol.9, name = 'Space Type',
+                     breaks = c('building.support', 'circulation', 'classroom', 'gym', 'laundry', 
+                                'lockers', 'office', 'pool', 'restroom'))
+ggsave('figures/pcoa_can_g_sampletype.png', width = 8, height = 6.5, units = 'in')
+
+####################################
+## plot Canberra NMDS
+df.nmds.can.nc <- as.data.frame(nmds.can.nc$points)
+colnames(df.nmds.can.nc) <- c('NMDS1', 'NMDS2')
+df.nmds.can.nc$SampleID <- rownames(df.nmds.can.nc)
+df.nmds.can.nc.all <- merge(df.nmds.can.nc, ger.map)
+
+## all samples by space type
+gg.nmds.can.nc <- ggplot(df.nmds.can.nc.all, aes(x = NMDS1, y = NMDS2, color = SpaceTypeBioBE))
+gg.nmds.can.nc + geom_point(size = 3) +
+  # ggtitle('NMDS on Canberra') +
+  geom_text(aes(y = NMDS2 + 0.01, label = Description), size = 3, vjust = 0) + 
+  scale_color_manual(values = mycol.9, name = 'Space Type',
+                     breaks = c('building.support', 'circulation', 'classroom', 'gym', 'laundry', 
+                                'lockers', 'office', 'pool', 'restroom'))
+ggsave('figures/nmds_can_g_sampletype.png', width = 8, height = 6.5, units = 'in')
+
+####################################
+## plot Canberra pcoa with crack/chem data
+## crack area NSF
+gg.pcoa.can.nc <- ggplot(df.pcoa.can.nc.all, aes(x = PCoA1, y = PCoA2, color = SpaceTypeBioBE, size = CrackAreaNSF))
+gg.pcoa.can.nc +   
+  geom_point(data = df.pcoa.can.nc.all[df.pcoa.can.nc.all$CrackNSFAvail == FALSE,], 
+             aes(x = PCoA1, y = PCoA2), 
+             size = 2, pch = 1, na.rm = FALSE) +
+  geom_point() + 
+  scale_size_continuous(range = c(3,8), name = 'Crack Area') +
+  scale_color_manual(values = mycol.9, name = 'Space Type',
+                     breaks = c('building.support', 'circulation', 'classroom', 'gym', 'laundry', 
+                                'lockers', 'office', 'pool', 'restroom'))
+ggsave('figures/pcoa_can_g_crackarea.png', width = 8, height = 6.5, units = 'in')
+
+## chem = TCSavg  
+gg.pcoa.can.nc <- ggplot(df.pcoa.can.nc.all, aes(x = PCoA1, y = PCoA2, color = SpaceTypeBioBE, size = TCSavg))
+gg.pcoa.can.nc + 
+  geom_point(data = df.pcoa.can.nc.all[df.pcoa.can.nc.all$ChemAvail == FALSE,], 
+             aes(x = PCoA1, y = PCoA2), 
+             size = 2, pch = 1) +
+  geom_point() + 
+  scale_color_manual(values = mycol.9, name = 'Space Type',
+                     breaks = c('building.support', 'circulation', 'classroom', 'gym', 'laundry', 
+                                'lockers', 'office', 'pool', 'restroom')) +
+  scale_size_continuous(range = c(3,8), name = 'Triclosan')
+ggsave('figures/pcoa_can_g_TCSavg.png', width = 8, height = 6.5, units = 'in')
+
+## chem = TCCavg  
+gg.pcoa.can.nc <- ggplot(df.pcoa.can.nc.all, aes(x = PCoA1, y = PCoA2, color = SpaceTypeBioBE, size = TCCavg))
+gg.pcoa.can.nc + 
+  geom_point(data = df.pcoa.can.nc.all[df.pcoa.can.nc.all$ChemAvail == FALSE,], 
+             aes(x = PCoA1, y = PCoA2), 
+             size = 2, pch = 1) +
+  geom_point() + 
+  scale_color_manual(values = mycol.9, name = 'Space Type',
+                     breaks = c('building.support', 'circulation', 'classroom', 'gym', 'laundry', 
+                                'lockers', 'office', 'pool', 'restroom')) +
+  scale_size_continuous(range = c(3,8), name = 'Triclocarban')
+ggsave('figures/pcoa_can_g_TCCavg.png', width = 8, height = 6.5, units = 'in')
+
+## chem = MePBavg  
+gg.pcoa.can.nc <- ggplot(df.pcoa.can.nc.all, aes(x = PCoA1, y = PCoA2, color = SpaceTypeBioBE, size = MePBavg))
+gg.pcoa.can.nc + 
+  geom_point(data = df.pcoa.can.nc.all[df.pcoa.can.nc.all$ChemAvail == FALSE,], 
+             aes(x = PCoA1, y = PCoA2), 
+             size = 2, pch = 1) +
+  geom_point() + 
+  scale_color_manual(values = mycol.9, name = 'Space Type',
+                     breaks = c('building.support', 'circulation', 'classroom', 'gym', 'laundry', 
+                                'lockers', 'office', 'pool', 'restroom')) +
+  scale_size_continuous(range = c(3,8), name = 'Methylparaben')
+ggsave('figures/pcoa_can_g_MePBavg.png', width = 8, height = 6.5, units = 'in')
+
+## chem = EtPBavg  
+gg.pcoa.can.nc <- ggplot(df.pcoa.can.nc.all, aes(x = PCoA1, y = PCoA2, color = SpaceTypeBioBE, size = EtPBavg))
+gg.pcoa.can.nc + 
+  geom_point(data = df.pcoa.can.nc.all[df.pcoa.can.nc.all$ChemAvail == FALSE,], 
+             aes(x = PCoA1, y = PCoA2), 
+             size = 2, pch = 1) +
+  geom_point() + 
+  scale_color_manual(values = mycol.9, name = 'Space Type',
+                     breaks = c('building.support', 'circulation', 'classroom', 'gym', 'laundry', 
+                                'lockers', 'office', 'pool', 'restroom')) +
+  scale_size_continuous(range = c(3,8), name = 'Ethylparaben')
+ggsave('figures/pcoa_can_g_EtPBavg.png', width = 8, height = 6.5, units = 'in')
+
+## chem = PrPBavg  
+gg.pcoa.can.nc <- ggplot(df.pcoa.can.nc.all, aes(x = PCoA1, y = PCoA2, color = SpaceTypeBioBE, size = PrPBavg))
+gg.pcoa.can.nc + 
+  geom_point(data = df.pcoa.can.nc.all[df.pcoa.can.nc.all$ChemAvail == FALSE,], 
+             aes(x = PCoA1, y = PCoA2), 
+             size = 2, pch = 1) +
+  geom_point() + 
+  scale_color_manual(values = mycol.9, name = 'Space Type',
+                     breaks = c('building.support', 'circulation', 'classroom', 'gym', 'laundry', 
+                                'lockers', 'office', 'pool', 'restroom')) +
+  scale_size_continuous(range = c(3,8), name = 'Propylparaben')
+ggsave('figures/pcoa_can_g_PrPBavg.png', width = 8, height = 6.5, units = 'in')
+
+## chem = BuBPavg  
+gg.pcoa.can.nc <- ggplot(df.pcoa.can.nc.all, aes(x = PCoA1, y = PCoA2, color = SpaceTypeBioBE, size = BuPBavg))
+gg.pcoa.can.nc + 
+  geom_point(data = df.pcoa.can.nc.all[df.pcoa.can.nc.all$ChemAvail == FALSE,], 
+             aes(x = PCoA1, y = PCoA2), 
+             size = 2, pch = 1) +
+  geom_point() + 
+  scale_color_manual(values = mycol.9, name = 'Space Type',
+                     breaks = c('building.support', 'circulation', 'classroom', 'gym', 'laundry', 
+                                'lockers', 'office', 'pool', 'restroom')) +
+  scale_size_continuous(range = c(3,8), name = 'Butylparaben')
+ggsave('figures/pcoa_can_g_BuPBavg.png', width = 8, height = 6.5, units = 'in')
