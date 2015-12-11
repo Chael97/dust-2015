@@ -66,8 +66,25 @@ plot(can.nc.mc ~ euc.chem.log, col = mycol.9[9],
      ylab = 'Canberra dissimilarity of taxonomy profiles',
      xlab = 'log Euclidean distance of chemical profiles')
 
+## put data into 'long form' for analysis and ggplot
+gg.dat <- na.omit(data.frame('dist.1' = c(can.nc.mc), 'dist.2' = c(euc.chem.log)))
+## pick a pretty color
+my.color <- mycol.9[9]
+## quick ggplot
+ggplot(gg.dat, aes(x = dist.2, y = dist.1)) + 
+  geom_point(colour = my.color, alpha = 0.8, size = 2) +
+  stat_smooth(colour = my.color, linetype = 2, method = "lm", formula = y ~ poly(x, 1), fill = my.color, level = .95) + ## fit a 2nd order polynomial. you can change the '2' value in poly() to fit different functions (e.g., 1 for a line)
+  guides(colour = FALSE, fill = FALSE) +
+  xlab('Chemical profile distance') +
+  ylab('Community distance (Canberra)') +
+#   geom_text(data = NULL, x = 8.25, y = 0.58, label = "r = 0.2039\np < 0.09", 
+#             size = 8) +
+  theme_bw() + 
+  theme(panel.grid.minor = element_blank())
+ggsave('figures/mantel_tax_chem.png', width = 6, height = 6, units = 'in')
+
 ## step 6a: mantel test (all chem)
-mantel(can.nc.mc, euc.chem.log) ## r = 0.2075, p = 0.074
+mantel(can.nc.mc, euc.chem.log) ## r = 0.2039, p = 0.086
 
 ## step 5b: plot taxonomy against chem profile distance (individual)
 par(mfrow = c(2,3))
@@ -318,4 +335,8 @@ plot(vegdist(ger.nc.rare.matchcard, method = 'canberra'),
 
 mantel(vegdist(ger.nc.rare.matchcard, method = 'canberra'), 
        vegdist(t(ger.card), method = 'gower')) ## r = 0.2677, p = 0.026 *
+```
+
+```{r}
+save.image('~/Documents/projects/gerlinger/results/ger_tax_resistome_chem_mantel_permanova.Rmd')
 ```

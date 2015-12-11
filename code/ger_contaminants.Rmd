@@ -1,5 +1,5 @@
 ---
-title: "Look for contamination in Gerlinger 16S rRNA data"
+title: "Look for contamination in 16S rRNA data"
 author: "Roxana Hickey"
 date: "Last updated December 9, 2015"
 output: 
@@ -82,6 +82,7 @@ ger.tax <- ger.tax[-c(plants, mito)] # remove from taxonomy to line up
 Make a full rarefied dataset including control and contaminants
 ```{r}
 sort(rowSums(ger))
+summary(rowSums(ger)) ## initial read counts (excluding plant, mitochondria)
 
 ger.10K <- rrarefy(ger, 10000)
 
@@ -394,6 +395,7 @@ text(pcoa.bc.nc$points[samples, 2] ~ pcoa.bc.nc$points[samples, 1],
      labels = rownames(pcoa.bc.nc$points[samples, ]), col = ger.map$bg[samples])
 
 sort(rowSums(ger.nc))
+summary(rowSums(ger.nc)) ## post-contaminant filtering
 ```
 
 Based on the NMDS and read counts, sample 'oneuL1201' is similar to the controls and has far fewer read counts than the rest of the samples. The controls are also well separated from the rest of the samples (i.e. their composition is different). Therefore, we will exclude the two controls and 
@@ -409,6 +411,7 @@ ger.map <- ger.map.all[-which(rownames(ger.map.all) %in% c('oneuL1201', 'oneuLco
 
 ## rarefy
 sort(rowSums(ger.nc)) ## minimum is 16,447
+sort(rowSums(ger.nc)) ## after excluding controls, low-count sample
 
 ger.nc.rare <- rrarefy(ger.nc, 16000)
 ger.nc.rare <- ger.nc.rare[, -which(colSums(ger.nc.rare) == 0)]

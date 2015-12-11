@@ -106,12 +106,12 @@ mantel(can.nc.mc, euc.chem.log) ## r = 0.2075, p = 0.074
 ## Call:
 ## mantel(xdis = can.nc.mc, ydis = euc.chem.log) 
 ## 
-## Mantel statistic r: 0.2075 
+## Mantel statistic r: 0.2039 
 ##       Significance: 0.071 
 ## 
 ## Upper quantiles of permutations (null model):
 ##   90%   95% 97.5%   99% 
-## 0.177 0.244 0.316 0.354 
+## 0.176 0.240 0.317 0.360 
 ## Permutation: free
 ## Number of permutations: 999
 ```
@@ -142,12 +142,12 @@ mantel(can.nc.mc, log(dist(ger.chem[,'TCSavg']) + 0.0001)) ## ns
 ## Call:
 ## mantel(xdis = can.nc.mc, ydis = log(dist(ger.chem[, "TCSavg"]) +      1e-04)) 
 ## 
-## Mantel statistic r: -0.02708 
-##       Significance: 0.543 
+## Mantel statistic r: -0.03422 
+##       Significance: 0.579 
 ## 
 ## Upper quantiles of permutations (null model):
 ##   90%   95% 97.5%   99% 
-## 0.138 0.184 0.221 0.251 
+## 0.140 0.183 0.225 0.247 
 ## Permutation: free
 ## Number of permutations: 999
 ```
@@ -163,12 +163,12 @@ mantel(can.nc.mc, log(dist(ger.chem[,'TCCavg']) + 0.0001)) ## r = 0.2389, p usua
 ## Call:
 ## mantel(xdis = can.nc.mc, ydis = log(dist(ger.chem[, "TCCavg"]) +      1e-04)) 
 ## 
-## Mantel statistic r: 0.2389 
-##       Significance: 0.073 
+## Mantel statistic r: 0.2289 
+##       Significance: 0.082 
 ## 
 ## Upper quantiles of permutations (null model):
 ##   90%   95% 97.5%   99% 
-## 0.208 0.269 0.329 0.376 
+## 0.204 0.272 0.335 0.366 
 ## Permutation: free
 ## Number of permutations: 999
 ```
@@ -184,12 +184,12 @@ mantel(can.nc.mc, log(dist(ger.chem[,'MePBavg']) + 0.0001)) ## ns
 ## Call:
 ## mantel(xdis = can.nc.mc, ydis = log(dist(ger.chem[, "MePBavg"]) +      1e-04)) 
 ## 
-## Mantel statistic r: -0.03142 
-##       Significance: 0.625 
+## Mantel statistic r: -0.03494 
+##       Significance: 0.646 
 ## 
 ## Upper quantiles of permutations (null model):
 ##   90%   95% 97.5%   99% 
-## 0.104 0.136 0.171 0.225 
+## 0.107 0.141 0.172 0.223 
 ## Permutation: free
 ## Number of permutations: 999
 ```
@@ -205,12 +205,12 @@ mantel(can.nc.mc, log(dist(ger.chem[,'EtPBavg']) + 0.0001)) ## ns
 ## Call:
 ## mantel(xdis = can.nc.mc, ydis = log(dist(ger.chem[, "EtPBavg"]) +      1e-04)) 
 ## 
-## Mantel statistic r: -0.04852 
-##       Significance: 0.664 
+## Mantel statistic r: -0.05362 
+##       Significance: 0.686 
 ## 
 ## Upper quantiles of permutations (null model):
 ##   90%   95% 97.5%   99% 
-## 0.125 0.172 0.200 0.244 
+## 0.126 0.168 0.196 0.239 
 ## Permutation: free
 ## Number of permutations: 999
 ```
@@ -226,12 +226,12 @@ mantel(can.nc.mc, log(dist(ger.chem[,'PrPBavg']) + 0.0001)) ## ns
 ## Call:
 ## mantel(xdis = can.nc.mc, ydis = log(dist(ger.chem[, "PrPBavg"]) +      1e-04)) 
 ## 
-## Mantel statistic r: 0.006674 
-##       Significance: 0.434 
+## Mantel statistic r: 0.006742 
+##       Significance: 0.435 
 ## 
 ## Upper quantiles of permutations (null model):
 ##   90%   95% 97.5%   99% 
-## 0.145 0.185 0.222 0.239 
+## 0.147 0.180 0.219 0.237 
 ## Permutation: free
 ## Number of permutations: 999
 ```
@@ -247,12 +247,12 @@ mantel(can.nc.mc, log(dist(ger.chem[,'BuPBavg']) + 0.0001)) ## ns
 ## Call:
 ## mantel(xdis = can.nc.mc, ydis = log(dist(ger.chem[, "BuPBavg"]) +      1e-04)) 
 ## 
-## Mantel statistic r: 0.06295 
-##       Significance: 0.2 
+## Mantel statistic r: 0.06053 
+##       Significance: 0.211 
 ## 
 ## Upper quantiles of permutations (null model):
-##   90%   95% 97.5%   99% 
-## 0.100 0.132 0.156 0.191 
+##    90%    95%  97.5%    99% 
+## 0.0987 0.1293 0.1540 0.1937 
 ## Permutation: free
 ## Number of permutations: 999
 ```
@@ -273,9 +273,9 @@ adonis(can.nc.mc ~ log(ger.chem$TCSavg)) ## R2 = 0.07157, p = 0.022 *
 ## Terms added sequentially (first to last)
 ## 
 ##                      Df SumsOfSqs MeanSqs F.Model      R2 Pr(>F)  
-## log(ger.chem$TCSavg)  1    0.4092 0.40921  1.5418 0.07157  0.022 *
-## Residuals            20    5.3083 0.26542         0.92843         
-## Total                21    5.7175                 1.00000         
+## log(ger.chem$TCSavg)  1    0.4113 0.41129  1.5463 0.07177  0.022 *
+## Residuals            20    5.3195 0.26598         0.92823         
+## Total                21    5.7308                 1.00000         
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
@@ -294,10 +294,10 @@ adonis(can.nc.mc ~ log(ger.chem$TCCavg)) ## R2 = 0.0594, p = 0.118 (ns)
 ## 
 ## Terms added sequentially (first to last)
 ## 
-##                      Df SumsOfSqs MeanSqs F.Model     R2 Pr(>F)
-## log(ger.chem$TCCavg)  1    0.3396  0.3396  1.2629 0.0594   0.11
-## Residuals            20    5.3779  0.2689         0.9406       
-## Total                21    5.7175                 1.0000
+##                      Df SumsOfSqs MeanSqs F.Model      R2 Pr(>F)
+## log(ger.chem$TCCavg)  1    0.3336 0.33360  1.2362 0.05821  0.137
+## Residuals            20    5.3972 0.26986         0.94179       
+## Total                21    5.7308                 1.00000
 ```
 
 ```r
@@ -315,9 +315,9 @@ adonis(can.nc.mc ~ log(ger.chem$EtPBavg)) ## R2 = 0.06908, p = 0.021 *
 ## Terms added sequentially (first to last)
 ## 
 ##                       Df SumsOfSqs MeanSqs F.Model      R2 Pr(>F)  
-## log(ger.chem$EtPBavg)  1    0.3950 0.39497  1.4841 0.06908   0.02 *
-## Residuals             20    5.3226 0.26613         0.93092         
-## Total                 21    5.7175                 1.00000         
+## log(ger.chem$EtPBavg)  1    0.3970 0.39704  1.4888 0.06928  0.021 *
+## Residuals             20    5.3338 0.26669         0.93072         
+## Total                 21    5.7308                 1.00000         
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
@@ -337,9 +337,9 @@ adonis(can.nc.mc ~ log(ger.chem$MePBavg)) ## R2 = 0.07697, p = 0.007 **
 ## Terms added sequentially (first to last)
 ## 
 ##                       Df SumsOfSqs MeanSqs F.Model      R2 Pr(>F)   
-## log(ger.chem$MePBavg)  1    0.4401 0.44006  1.6677 0.07697  0.006 **
-## Residuals             20    5.2775 0.26387         0.92303          
-## Total                 21    5.7175                 1.00000          
+## log(ger.chem$MePBavg)  1    0.4466 0.44664  1.6905 0.07794  0.006 **
+## Residuals             20    5.2842 0.26421         0.92206          
+## Total                 21    5.7308                 1.00000          
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
@@ -359,9 +359,9 @@ adonis(can.nc.mc ~ log(ger.chem$PrPBavg)) ## R2 = 0.08092, p = 0.004 **
 ## Terms added sequentially (first to last)
 ## 
 ##                       Df SumsOfSqs MeanSqs F.Model      R2 Pr(>F)    
-## log(ger.chem$PrPBavg)  1    0.4626 0.46264  1.7608 0.08092  0.001 ***
-## Residuals             20    5.2549 0.26274         0.91908           
-## Total                 21    5.7175                 1.00000           
+## log(ger.chem$PrPBavg)  1    0.4701 0.47008  1.7872 0.08203  0.001 ***
+## Residuals             20    5.2607 0.26304         0.91797           
+## Total                 21    5.7308                 1.00000           
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
@@ -381,9 +381,9 @@ adonis(can.nc.mc ~ log(ger.chem$BuPBavg)) ## R2 = 0.07886, p = 0.008 **
 ## Terms added sequentially (first to last)
 ## 
 ##                       Df SumsOfSqs MeanSqs F.Model      R2 Pr(>F)   
-## log(ger.chem$BuPBavg)  1    0.4509 0.45089  1.7123 0.07886  0.005 **
-## Residuals             20    5.2666 0.26333         0.92114          
-## Total                 21    5.7175                 1.00000          
+## log(ger.chem$BuPBavg)  1    0.4543 0.45434  1.7221 0.07928  0.006 **
+## Residuals             20    5.2765 0.26382         0.92072          
+## Total                 21    5.7308                 1.00000          
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
@@ -403,9 +403,9 @@ adonis(bc.nc.mc ~ log(ger.chem$TCSavg)) ## R2 = 0.07307, p = 0.106 (ns)
 ## Terms added sequentially (first to last)
 ## 
 ##                      Df SumsOfSqs MeanSqs F.Model      R2 Pr(>F)  
-## log(ger.chem$TCSavg)  1    0.3067 0.30667  1.5766 0.07307  0.099 .
-## Residuals            20    3.8902 0.19451         0.92693         
-## Total                21    4.1969                 1.00000         
+## log(ger.chem$TCSavg)  1    0.3111 0.31110  1.5971 0.07395  0.095 .
+## Residuals            20    3.8958 0.19479         0.92605         
+## Total                21    4.2069                 1.00000         
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
@@ -425,9 +425,9 @@ adonis(bc.nc.mc ~ log(ger.chem$TCCavg)) ## R2 = 0.09499,  p = 0.052 . (marginall
 ## Terms added sequentially (first to last)
 ## 
 ##                      Df SumsOfSqs MeanSqs F.Model      R2 Pr(>F)  
-## log(ger.chem$TCCavg)  1    0.3986 0.39865  2.0991 0.09499  0.054 .
-## Residuals            20    3.7982 0.18991         0.90501         
-## Total                21    4.1969                 1.00000         
+## log(ger.chem$TCCavg)  1    0.4006 0.40059  2.1049 0.09522  0.052 .
+## Residuals            20    3.8063 0.19031         0.90478         
+## Total                21    4.2069                 1.00000         
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
@@ -447,9 +447,9 @@ adonis(bc.nc.mc ~ log(ger.chem$EtPBavg)) ## R2 = 0.06254, p = 0.156 (ns)
 ## Terms added sequentially (first to last)
 ## 
 ##                       Df SumsOfSqs MeanSqs F.Model      R2 Pr(>F)
-## log(ger.chem$EtPBavg)  1    0.2625 0.26248  1.3343 0.06254  0.173
-## Residuals             20    3.9344 0.19672         0.93746       
-## Total                 21    4.1969                 1.00000
+## log(ger.chem$EtPBavg)  1    0.2690 0.26902  1.3663 0.06395  0.158
+## Residuals             20    3.9379 0.19689         0.93605       
+## Total                 21    4.2069                 1.00000
 ```
 
 ```r
@@ -467,9 +467,9 @@ adonis(bc.nc.mc ~ log(ger.chem$MePBavg)) ## R2 = 0.09015, p = 0.06 . (marginally
 ## Terms added sequentially (first to last)
 ## 
 ##                       Df SumsOfSqs MeanSqs F.Model      R2 Pr(>F)  
-## log(ger.chem$MePBavg)  1    0.3784 0.37837  1.9818 0.09015  0.072 .
-## Residuals             20    3.8185 0.19093         0.90985         
-## Total                 21    4.1969                 1.00000         
+## log(ger.chem$MePBavg)  1    0.3835 0.38355  2.0063 0.09117  0.065 .
+## Residuals             20    3.8233 0.19117         0.90883         
+## Total                 21    4.2069                 1.00000         
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
@@ -489,9 +489,9 @@ adonis(bc.nc.mc ~ log(ger.chem$PrPBavg)) ## R2 = 0.09308, p = 0.045 *
 ## Terms added sequentially (first to last)
 ## 
 ##                       Df SumsOfSqs MeanSqs F.Model      R2 Pr(>F)  
-## log(ger.chem$PrPBavg)  1    0.3907 0.39065  2.0527 0.09308   0.05 *
-## Residuals             20    3.8062 0.19031         0.90692         
-## Total                 21    4.1969                 1.00000         
+## log(ger.chem$PrPBavg)  1    0.3966 0.39657  2.0815 0.09427  0.047 *
+## Residuals             20    3.8103 0.19052         0.90573         
+## Total                 21    4.2069                 1.00000         
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
@@ -511,9 +511,9 @@ adonis(bc.nc.mc ~ log(ger.chem$BuPBavg)) ## R2 = 0.08765, p = 0.055 . (marginall
 ## Terms added sequentially (first to last)
 ## 
 ##                       Df SumsOfSqs MeanSqs F.Model      R2 Pr(>F)  
-## log(ger.chem$BuPBavg)  1    0.3679 0.36787  1.9215 0.08765  0.037 *
-## Residuals             20    3.8290 0.19145         0.91235         
-## Total                 21    4.1969                 1.00000         
+## log(ger.chem$BuPBavg)  1    0.3732 0.37321   1.947 0.08871  0.036 *
+## Residuals             20    3.8337 0.19168         0.91129         
+## Total                 21    4.2069                 1.00000         
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
@@ -1235,12 +1235,12 @@ mantel(vegdist(ger.nc.rare.matchardb, method = 'canberra'),
 ## Call:
 ## mantel(xdis = vegdist(ger.nc.rare.matchardb, method = "canberra"),      ydis = vegdist(t(ger.ardb), method = "gower")) 
 ## 
-## Mantel statistic r: 0.2844 
-##       Significance: 0.024 
+## Mantel statistic r: 0.2826 
+##       Significance: 0.026 
 ## 
 ## Upper quantiles of permutations (null model):
 ##   90%   95% 97.5%   99% 
-## 0.185 0.235 0.282 0.334 
+## 0.185 0.231 0.283 0.318 
 ## Permutation: free
 ## Number of permutations: 999
 ```
@@ -1297,12 +1297,17 @@ mantel(vegdist(ger.nc.rare.matchcard, method = 'canberra'),
 ## Call:
 ## mantel(xdis = vegdist(ger.nc.rare.matchcard, method = "canberra"),      ydis = vegdist(t(ger.card), method = "gower")) 
 ## 
-## Mantel statistic r: 0.2677 
-##       Significance: 0.027 
+## Mantel statistic r: 0.2612 
+##       Significance: 0.031 
 ## 
 ## Upper quantiles of permutations (null model):
 ##   90%   95% 97.5%   99% 
-## 0.178 0.229 0.269 0.308 
+## 0.180 0.224 0.271 0.308 
 ## Permutation: free
 ## Number of permutations: 999
+```
+
+
+```r
+save.image('~/Documents/projects/gerlinger/results/ger_tax_resistome_chem_mantel_permanova.Rmd')
 ```
