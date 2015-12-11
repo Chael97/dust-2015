@@ -1,4 +1,4 @@
-# Look for contamination in Gerlinger 16S rRNA data
+# Look for contamination in 16S rRNA data
 Roxana Hickey  
 Last updated December 9, 2015  
 
@@ -159,6 +159,15 @@ sort(rowSums(ger))
 ```
 
 ```r
+summary(rowSums(ger)) ## initial read counts (excluding plant, mitochondria)
+```
+
+```
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##   10010   21560   23910   23770   25350   37480
+```
+
+```r
 ger.10K <- rrarefy(ger, 10000)
 
 dim(ger.10K)
@@ -235,12 +244,12 @@ head(taxo)
 ## Archaea;Euryarchaeota;Methanobacteria;Methanobacteriales;Methanobacteriaceae;Methanobacterium                Methanobacterium
 ## Bacteria;;;;;                                                                                                                
 ##                                                                                                     abundance
-## Archaea;Crenarchaeota;Thaumarchaeota;Nitrososphaerales;Nitrososphaeraceae;                                  5
-## Archaea;Crenarchaeota;Thaumarchaeota;Nitrososphaerales;Nitrososphaeraceae;Candidatus Nitrososphaera        19
+## Archaea;Crenarchaeota;Thaumarchaeota;Nitrososphaerales;Nitrososphaeraceae;                                  1
+## Archaea;Crenarchaeota;Thaumarchaeota;Nitrososphaerales;Nitrososphaeraceae;Candidatus Nitrososphaera        32
 ## Archaea;Euryarchaeota;Halobacteria;Halobacteriales;Halobacteriaceae;                                        0
 ## Archaea;Euryarchaeota;Halobacteria;Halobacteriales;Halobacteriaceae;Haloterrigena                           3
-## Archaea;Euryarchaeota;Methanobacteria;Methanobacteriales;Methanobacteriaceae;Methanobacterium               1
-## Bacteria;;;;;                                                                                               0
+## Archaea;Euryarchaeota;Methanobacteria;Methanobacteriales;Methanobacteriaceae;Methanobacterium               2
+## Bacteria;;;;;                                                                                               1
 ```
 
 Get rid of empty OTUs to reduce computing demand.
@@ -257,50 +266,50 @@ head(taxo)
 ## Archaea;Crenarchaeota;Thaumarchaeota;Nitrososphaerales;Nitrososphaeraceae;Candidatus Nitrososphaera  Archaea
 ## Archaea;Euryarchaeota;Halobacteria;Halobacteriales;Halobacteriaceae;Haloterrigena                    Archaea
 ## Archaea;Euryarchaeota;Methanobacteria;Methanobacteriales;Methanobacteriaceae;Methanobacterium        Archaea
+## Bacteria;;;;;                                                                                       Bacteria
 ## Bacteria;Acidobacteria;;;;                                                                          Bacteria
-## Bacteria;Acidobacteria;Acidobacteria-5;;;                                                           Bacteria
 ##                                                                                                            phylum
 ## Archaea;Crenarchaeota;Thaumarchaeota;Nitrososphaerales;Nitrososphaeraceae;                          Crenarchaeota
 ## Archaea;Crenarchaeota;Thaumarchaeota;Nitrososphaerales;Nitrososphaeraceae;Candidatus Nitrososphaera Crenarchaeota
 ## Archaea;Euryarchaeota;Halobacteria;Halobacteriales;Halobacteriaceae;Haloterrigena                   Euryarchaeota
 ## Archaea;Euryarchaeota;Methanobacteria;Methanobacteriales;Methanobacteriaceae;Methanobacterium       Euryarchaeota
+## Bacteria;;;;;                                                                                                    
 ## Bacteria;Acidobacteria;;;;                                                                          Acidobacteria
-## Bacteria;Acidobacteria;Acidobacteria-5;;;                                                           Acidobacteria
 ##                                                                                                               class
 ## Archaea;Crenarchaeota;Thaumarchaeota;Nitrososphaerales;Nitrososphaeraceae;                           Thaumarchaeota
 ## Archaea;Crenarchaeota;Thaumarchaeota;Nitrososphaerales;Nitrososphaeraceae;Candidatus Nitrososphaera  Thaumarchaeota
 ## Archaea;Euryarchaeota;Halobacteria;Halobacteriales;Halobacteriaceae;Haloterrigena                      Halobacteria
 ## Archaea;Euryarchaeota;Methanobacteria;Methanobacteriales;Methanobacteriaceae;Methanobacterium       Methanobacteria
+## Bacteria;;;;;                                                                                                      
 ## Bacteria;Acidobacteria;;;;                                                                                         
-## Bacteria;Acidobacteria;Acidobacteria-5;;;                                                           Acidobacteria-5
 ##                                                                                                                  order
 ## Archaea;Crenarchaeota;Thaumarchaeota;Nitrososphaerales;Nitrososphaeraceae;                           Nitrososphaerales
 ## Archaea;Crenarchaeota;Thaumarchaeota;Nitrososphaerales;Nitrososphaeraceae;Candidatus Nitrososphaera  Nitrososphaerales
 ## Archaea;Euryarchaeota;Halobacteria;Halobacteriales;Halobacteriaceae;Haloterrigena                      Halobacteriales
 ## Archaea;Euryarchaeota;Methanobacteria;Methanobacteriales;Methanobacteriaceae;Methanobacterium       Methanobacteriales
+## Bacteria;;;;;                                                                                                         
 ## Bacteria;Acidobacteria;;;;                                                                                            
-## Bacteria;Acidobacteria;Acidobacteria-5;;;                                                                             
 ##                                                                                                                  family
 ## Archaea;Crenarchaeota;Thaumarchaeota;Nitrososphaerales;Nitrososphaeraceae;                           Nitrososphaeraceae
 ## Archaea;Crenarchaeota;Thaumarchaeota;Nitrososphaerales;Nitrososphaeraceae;Candidatus Nitrososphaera  Nitrososphaeraceae
 ## Archaea;Euryarchaeota;Halobacteria;Halobacteriales;Halobacteriaceae;Haloterrigena                      Halobacteriaceae
 ## Archaea;Euryarchaeota;Methanobacteria;Methanobacteriales;Methanobacteriaceae;Methanobacterium       Methanobacteriaceae
+## Bacteria;;;;;                                                                                                          
 ## Bacteria;Acidobacteria;;;;                                                                                             
-## Bacteria;Acidobacteria;Acidobacteria-5;;;                                                                              
 ##                                                                                                                         genus
 ## Archaea;Crenarchaeota;Thaumarchaeota;Nitrososphaerales;Nitrososphaeraceae;                                                   
 ## Archaea;Crenarchaeota;Thaumarchaeota;Nitrososphaerales;Nitrososphaeraceae;Candidatus Nitrososphaera Candidatus Nitrososphaera
 ## Archaea;Euryarchaeota;Halobacteria;Halobacteriales;Halobacteriaceae;Haloterrigena                               Haloterrigena
 ## Archaea;Euryarchaeota;Methanobacteria;Methanobacteriales;Methanobacteriaceae;Methanobacterium                Methanobacterium
+## Bacteria;;;;;                                                                                                                
 ## Bacteria;Acidobacteria;;;;                                                                                                   
-## Bacteria;Acidobacteria;Acidobacteria-5;;;                                                                                    
 ##                                                                                                     abundance
-## Archaea;Crenarchaeota;Thaumarchaeota;Nitrososphaerales;Nitrososphaeraceae;                                  5
-## Archaea;Crenarchaeota;Thaumarchaeota;Nitrososphaerales;Nitrososphaeraceae;Candidatus Nitrososphaera        19
+## Archaea;Crenarchaeota;Thaumarchaeota;Nitrososphaerales;Nitrososphaeraceae;                                  1
+## Archaea;Crenarchaeota;Thaumarchaeota;Nitrososphaerales;Nitrososphaeraceae;Candidatus Nitrososphaera        32
 ## Archaea;Euryarchaeota;Halobacteria;Halobacteriales;Halobacteriaceae;Haloterrigena                           3
-## Archaea;Euryarchaeota;Methanobacteria;Methanobacteriales;Methanobacteriaceae;Methanobacterium               1
-## Bacteria;Acidobacteria;;;;                                                                                  7
-## Bacteria;Acidobacteria;Acidobacteria-5;;;                                                                  17
+## Archaea;Euryarchaeota;Methanobacteria;Methanobacteriales;Methanobacteriaceae;Methanobacterium               2
+## Bacteria;;;;;                                                                                               1
+## Bacteria;Acidobacteria;;;;                                                                                  9
 ```
 
 ```r
@@ -308,7 +317,7 @@ dim(taxo)
 ```
 
 ```
-## [1] 764   7
+## [1] 769   7
 ```
 
 ```r
@@ -316,7 +325,7 @@ dim(ger.10K)
 ```
 
 ```
-## [1]  45 764
+## [1]  45 769
 ```
 
 ```r
@@ -348,6 +357,8 @@ consensus[1:10]
 ##                                                                                     "Haloterrigena" 
 ##       Archaea;Euryarchaeota;Methanobacteria;Methanobacteriales;Methanobacteriaceae;Methanobacterium 
 ##                                                                                  "Methanobacterium" 
+##                                                                                       Bacteria;;;;; 
+##                                                                                          "Bacteria" 
 ##                                                                          Bacteria;Acidobacteria;;;; 
 ##                                                                                     "Acidobacteria" 
 ##                                                           Bacteria;Acidobacteria;Acidobacteria-5;;; 
@@ -357,9 +368,7 @@ consensus[1:10]
 ##                                                      Bacteria;Acidobacteria;Acidobacteria-6;CCU21;; 
 ##                                                                                             "CCU21" 
 ##                                                    Bacteria;Acidobacteria;Acidobacteria-6;iii1-15;; 
-##                                                                                           "iii1-15" 
-##                                                Bacteria;Acidobacteria;Acidobacteria-6;iii1-15;RB40; 
-##                                                                                              "RB40"
+##                                                                                           "iii1-15"
 ```
 
 Some indexing and metadata stuff for figures and such.
@@ -419,12 +428,11 @@ nmds.can <- nmds(can)
 ```
 
 ```
-## initial  value 29.885323 
-## iter   5 value 16.204640
-## iter  10 value 15.080632
-## iter  10 value 15.071581
-## iter  10 value 15.071581
-## final  value 15.071581 
+## initial  value 30.530011 
+## iter   5 value 15.945598
+## iter  10 value 14.815521
+## iter  15 value 14.337593
+## final  value 14.128779 
 ## converged
 ```
 
@@ -433,12 +441,15 @@ nmds.bc <- nmds(bc)
 ```
 
 ```
-## initial  value 31.419814 
-## iter   5 value 21.744462
-## iter  10 value 19.236342
-## iter  15 value 18.688284
-## iter  20 value 18.494619
-## final  value 18.390289 
+## initial  value 31.403328 
+## iter   5 value 22.055913
+## iter  10 value 19.510061
+## iter  15 value 18.733963
+## iter  20 value 18.577043
+## iter  25 value 18.425725
+## iter  25 value 18.410660
+## iter  25 value 18.402445
+## final  value 18.402445 
 ## converged
 ```
 
@@ -579,8 +590,8 @@ for (i in 1:10) {
 ##                                                                               genus
 ## Bacteria;Proteobacteria;Gammaproteobacteria;Oceanospirillales;Halomonadaceae;      
 ##                                                                               abundance
-## Bacteria;Proteobacteria;Gammaproteobacteria;Oceanospirillales;Halomonadaceae;     15694
-## [1] 0.03487556
+## Bacteria;Proteobacteria;Gammaproteobacteria;Oceanospirillales;Halomonadaceae;     15668
+## [1] 0.03481778
 ```
 
 ```
@@ -597,8 +608,8 @@ for (i in 1:10) {
 ##                                                                                      genus
 ## Bacteria;Firmicutes;Bacilli;Bacillales;[Exiguobacteraceae];Exiguobacterium Exiguobacterium
 ##                                                                            abundance
-## Bacteria;Firmicutes;Bacilli;Bacillales;[Exiguobacteraceae];Exiguobacterium      2109
-## [1] 0.004686667
+## Bacteria;Firmicutes;Bacilli;Bacillales;[Exiguobacteraceae];Exiguobacterium      2130
+## [1] 0.004733333
 ```
 
 ```
@@ -615,8 +626,8 @@ for (i in 1:10) {
 ##                                                                                            genus
 ## Bacteria;Proteobacteria;Gammaproteobacteria;Alteromonadales;Shewanellaceae;Shewanella Shewanella
 ##                                                                                       abundance
-## Bacteria;Proteobacteria;Gammaproteobacteria;Alteromonadales;Shewanellaceae;Shewanella      3650
-## [1] 0.008111111
+## Bacteria;Proteobacteria;Gammaproteobacteria;Alteromonadales;Shewanellaceae;Shewanella      3691
+## [1] 0.008202222
 ```
 
 ```
@@ -633,8 +644,8 @@ for (i in 1:10) {
 ##                                                                                                 genus
 ## Bacteria;Proteobacteria;Gammaproteobacteria;Pseudomonadales;Moraxellaceae;Acinetobacter Acinetobacter
 ##                                                                                         abundance
-## Bacteria;Proteobacteria;Gammaproteobacteria;Pseudomonadales;Moraxellaceae;Acinetobacter      7350
-## [1] 0.01633333
+## Bacteria;Proteobacteria;Gammaproteobacteria;Pseudomonadales;Moraxellaceae;Acinetobacter      7268
+## [1] 0.01615111
 ```
 
 ```
@@ -651,8 +662,8 @@ for (i in 1:10) {
 ##                                                                genus
 ## Bacteria;Firmicutes;Bacilli;Bacillales;Bacillaceae;Bacillus Bacillus
 ##                                                             abundance
-## Bacteria;Firmicutes;Bacilli;Bacillales;Bacillaceae;Bacillus      9096
-## [1] 0.02021333
+## Bacteria;Firmicutes;Bacilli;Bacillales;Bacillaceae;Bacillus      9092
+## [1] 0.02020444
 ```
 
 ```
@@ -669,8 +680,8 @@ for (i in 1:10) {
 ##                                                                                   genus
 ## Bacteria;Proteobacteria;Gammaproteobacteria;Enterobacteriales;Enterobacteriaceae;      
 ##                                                                                   abundance
-## Bacteria;Proteobacteria;Gammaproteobacteria;Enterobacteriales;Enterobacteriaceae;     21165
-## [1] 0.04703333
+## Bacteria;Proteobacteria;Gammaproteobacteria;Enterobacteriales;Enterobacteriaceae;     21011
+## [1] 0.04669111
 ```
 
 ```
@@ -687,8 +698,8 @@ for (i in 1:10) {
 ##                                                                                 genus
 ## Bacteria;Bacteroidetes;Sphingobacteriia;Sphingobacteriales;Sphingobacteriaceae;      
 ##                                                                                 abundance
-## Bacteria;Bacteroidetes;Sphingobacteriia;Sphingobacteriales;Sphingobacteriaceae;      4133
-## [1] 0.009184444
+## Bacteria;Bacteroidetes;Sphingobacteriia;Sphingobacteriales;Sphingobacteriaceae;      4211
+## [1] 0.009357778
 ```
 
 ```
@@ -705,8 +716,8 @@ for (i in 1:10) {
 ##                                                                                    genus
 ## Bacteria;Firmicutes;Bacilli;Lactobacillales;Lactobacillaceae;Lactobacillus Lactobacillus
 ##                                                                            abundance
-## Bacteria;Firmicutes;Bacilli;Lactobacillales;Lactobacillaceae;Lactobacillus      5388
-## [1] 0.01197333
+## Bacteria;Firmicutes;Bacilli;Lactobacillales;Lactobacillaceae;Lactobacillus      5452
+## [1] 0.01211556
 ```
 
 ```
@@ -723,8 +734,8 @@ for (i in 1:10) {
 ##                                                                                                    genus
 ## Bacteria;Bacteroidetes;Flavobacteriia;Flavobacteriales;[Weeksellaceae];Chryseobacterium Chryseobacterium
 ##                                                                                         abundance
-## Bacteria;Bacteroidetes;Flavobacteriia;Flavobacteriales;[Weeksellaceae];Chryseobacterium      1437
-## [1] 0.003193333
+## Bacteria;Bacteroidetes;Flavobacteriia;Flavobacteriales;[Weeksellaceae];Chryseobacterium      1447
+## [1] 0.003215556
 ```
 
 ```
@@ -741,8 +752,8 @@ for (i in 1:10) {
 ##                                                                              genus
 ## Bacteria;Proteobacteria;Gammaproteobacteria;Vibrionales;Vibrionaceae;Vibrio Vibrio
 ##                                                                             abundance
-## Bacteria;Proteobacteria;Gammaproteobacteria;Vibrionales;Vibrionaceae;Vibrio       595
-## [1] 0.001322222
+## Bacteria;Proteobacteria;Gammaproteobacteria;Vibrionales;Vibrionaceae;Vibrio       600
+## [1] 0.001333333
 ```
 
 ```r
@@ -824,8 +835,8 @@ for (i in 1:10) {
 ##                                                                               genus
 ## Bacteria;Proteobacteria;Gammaproteobacteria;Oceanospirillales;Halomonadaceae;      
 ##                                                                               abundance
-## Bacteria;Proteobacteria;Gammaproteobacteria;Oceanospirillales;Halomonadaceae;     15694
-## [1] 0.03487556
+## Bacteria;Proteobacteria;Gammaproteobacteria;Oceanospirillales;Halomonadaceae;     15668
+## [1] 0.03481778
 ```
 
 ```
@@ -842,8 +853,8 @@ for (i in 1:10) {
 ##                                                                                      genus
 ## Bacteria;Firmicutes;Bacilli;Bacillales;[Exiguobacteraceae];Exiguobacterium Exiguobacterium
 ##                                                                            abundance
-## Bacteria;Firmicutes;Bacilli;Bacillales;[Exiguobacteraceae];Exiguobacterium      2109
-## [1] 0.004686667
+## Bacteria;Firmicutes;Bacilli;Bacillales;[Exiguobacteraceae];Exiguobacterium      2130
+## [1] 0.004733333
 ```
 
 ```
@@ -860,8 +871,8 @@ for (i in 1:10) {
 ##                                                                                            genus
 ## Bacteria;Proteobacteria;Gammaproteobacteria;Alteromonadales;Shewanellaceae;Shewanella Shewanella
 ##                                                                                       abundance
-## Bacteria;Proteobacteria;Gammaproteobacteria;Alteromonadales;Shewanellaceae;Shewanella      3650
-## [1] 0.008111111
+## Bacteria;Proteobacteria;Gammaproteobacteria;Alteromonadales;Shewanellaceae;Shewanella      3691
+## [1] 0.008202222
 ```
 
 ```
@@ -878,8 +889,8 @@ for (i in 1:10) {
 ##                                                                                                 genus
 ## Bacteria;Proteobacteria;Gammaproteobacteria;Pseudomonadales;Moraxellaceae;Acinetobacter Acinetobacter
 ##                                                                                         abundance
-## Bacteria;Proteobacteria;Gammaproteobacteria;Pseudomonadales;Moraxellaceae;Acinetobacter      7350
-## [1] 0.01633333
+## Bacteria;Proteobacteria;Gammaproteobacteria;Pseudomonadales;Moraxellaceae;Acinetobacter      7268
+## [1] 0.01615111
 ```
 
 ```
@@ -896,8 +907,8 @@ for (i in 1:10) {
 ##                                                                genus
 ## Bacteria;Firmicutes;Bacilli;Bacillales;Bacillaceae;Bacillus Bacillus
 ##                                                             abundance
-## Bacteria;Firmicutes;Bacilli;Bacillales;Bacillaceae;Bacillus      9096
-## [1] 0.02021333
+## Bacteria;Firmicutes;Bacilli;Bacillales;Bacillaceae;Bacillus      9092
+## [1] 0.02020444
 ```
 
 ```
@@ -914,8 +925,8 @@ for (i in 1:10) {
 ##                                                                                   genus
 ## Bacteria;Proteobacteria;Gammaproteobacteria;Enterobacteriales;Enterobacteriaceae;      
 ##                                                                                   abundance
-## Bacteria;Proteobacteria;Gammaproteobacteria;Enterobacteriales;Enterobacteriaceae;     21165
-## [1] 0.04703333
+## Bacteria;Proteobacteria;Gammaproteobacteria;Enterobacteriales;Enterobacteriaceae;     21011
+## [1] 0.04669111
 ```
 
 ```
@@ -932,8 +943,8 @@ for (i in 1:10) {
 ##                                                                                 genus
 ## Bacteria;Bacteroidetes;Sphingobacteriia;Sphingobacteriales;Sphingobacteriaceae;      
 ##                                                                                 abundance
-## Bacteria;Bacteroidetes;Sphingobacteriia;Sphingobacteriales;Sphingobacteriaceae;      4133
-## [1] 0.009184444
+## Bacteria;Bacteroidetes;Sphingobacteriia;Sphingobacteriales;Sphingobacteriaceae;      4211
+## [1] 0.009357778
 ```
 
 ```
@@ -950,8 +961,8 @@ for (i in 1:10) {
 ##                                                                                    genus
 ## Bacteria;Firmicutes;Bacilli;Lactobacillales;Lactobacillaceae;Lactobacillus Lactobacillus
 ##                                                                            abundance
-## Bacteria;Firmicutes;Bacilli;Lactobacillales;Lactobacillaceae;Lactobacillus      5388
-## [1] 0.01197333
+## Bacteria;Firmicutes;Bacilli;Lactobacillales;Lactobacillaceae;Lactobacillus      5452
+## [1] 0.01211556
 ```
 
 ```
@@ -968,8 +979,8 @@ for (i in 1:10) {
 ##                                                                                                    genus
 ## Bacteria;Bacteroidetes;Flavobacteriia;Flavobacteriales;[Weeksellaceae];Chryseobacterium Chryseobacterium
 ##                                                                                         abundance
-## Bacteria;Bacteroidetes;Flavobacteriia;Flavobacteriales;[Weeksellaceae];Chryseobacterium      1437
-## [1] 0.003193333
+## Bacteria;Bacteroidetes;Flavobacteriia;Flavobacteriales;[Weeksellaceae];Chryseobacterium      1447
+## [1] 0.003215556
 ```
 
 ```
@@ -986,8 +997,8 @@ for (i in 1:10) {
 ##                                                                              genus
 ## Bacteria;Proteobacteria;Gammaproteobacteria;Vibrionales;Vibrionaceae;Vibrio Vibrio
 ##                                                                             abundance
-## Bacteria;Proteobacteria;Gammaproteobacteria;Vibrionales;Vibrionaceae;Vibrio       595
-## [1] 0.001322222
+## Bacteria;Proteobacteria;Gammaproteobacteria;Vibrionales;Vibrionaceae;Vibrio       600
+## [1] 0.001333333
 ```
 
 ```r
@@ -1004,25 +1015,25 @@ rev(sort(colSums(ger.10K)))[1:10]
 
 ```
 ##   Bacteria;Proteobacteria;Alphaproteobacteria;Sphingomonadales;Sphingomonadaceae;Sphingomonas 
-##                                                                                         31456 
+##                                                                                         31465 
 ##             Bacteria;Proteobacteria;Gammaproteobacteria;Enterobacteriales;Enterobacteriaceae; 
-##                                                                                         21165 
+##                                                                                         21011 
 ##                     Bacteria;Bacteroidetes;Cytophagia;Cytophagales;Cytophagaceae;Hymenobacter 
-##                                                                                         19449 
+##                                                                                         19343 
 ##        Bacteria;Actinobacteria;Actinobacteria;Actinomycetales;Microbacteriaceae;Rathayibacter 
-##                                                                                         16771 
+##                                                                                         16953 
 ##                 Bacteria;Proteobacteria;Gammaproteobacteria;Oceanospirillales;Halomonadaceae; 
-##                                                                                         15694 
+##                                                                                         15668 
 ##      Bacteria;Proteobacteria;Gammaproteobacteria;Pseudomonadales;Pseudomonadaceae;Pseudomonas 
-##                                                                                         14782 
+##                                                                                         14684 
 ##                  Bacteria;Proteobacteria;Betaproteobacteria;Burkholderiales;Oxalobacteraceae; 
-##                                                                                         14086 
+##                                                                                         14016 
 ## Bacteria;Proteobacteria;Alphaproteobacteria;Rhodobacterales;Rhodobacteraceae;Rubellimicrobium 
-##                                                                                         13010 
+##                                                                                         13050 
 ##                     Bacteria;Actinobacteria;Actinobacteria;Actinomycetales;Microbacteriaceae; 
-##                                                                                         12460 
+##                                                                                         12532 
 ##     Bacteria;Actinobacteria;Actinobacteria;Actinomycetales;Corynebacteriaceae;Corynebacterium 
-##                                                                                         12070
+##                                                                                         12204
 ```
 
 ```r
@@ -1068,11 +1079,11 @@ taxo[halo, ]
 ## Bacteria;Proteobacteria;Gammaproteobacteria;Oceanospirillales;Halomonadaceae;Halomonas                     Halomonas
 ## Bacteria;Proteobacteria;Gammaproteobacteria;Oceanospirillales;Halomonadaceae;Kushneria                     Kushneria
 ##                                                                                                  abundance
-## Bacteria;Proteobacteria;Gammaproteobacteria;Oceanospirillales;Halomonadaceae;                        15694
-## Bacteria;Proteobacteria;Gammaproteobacteria;Oceanospirillales;Halomonadaceae;Candidatus Portiera        36
+## Bacteria;Proteobacteria;Gammaproteobacteria;Oceanospirillales;Halomonadaceae;                        15668
+## Bacteria;Proteobacteria;Gammaproteobacteria;Oceanospirillales;Halomonadaceae;Candidatus Portiera        35
 ## Bacteria;Proteobacteria;Gammaproteobacteria;Oceanospirillales;Halomonadaceae;Haererehalobacter           1
-## Bacteria;Proteobacteria;Gammaproteobacteria;Oceanospirillales;Halomonadaceae;Halomonas                  72
-## Bacteria;Proteobacteria;Gammaproteobacteria;Oceanospirillales;Halomonadaceae;Kushneria                   2
+## Bacteria;Proteobacteria;Gammaproteobacteria;Oceanospirillales;Halomonadaceae;Halomonas                  71
+## Bacteria;Proteobacteria;Gammaproteobacteria;Oceanospirillales;Halomonadaceae;Kushneria                   1
 ```
 
 ```r
@@ -1081,23 +1092,23 @@ ger.10K[, halo[1]] # only #1 and #4 are prevalent in controls
 
 ```
 ##     oneuL1201     oneuL1202  oneuL120a1.2  oneuL120a2.2    oneuL120e1 
-##          6987            24            78            24           106 
+##          7056            22            82            28            99 
 ##     oneuL1251     oneuL1252  oneuL125a1.2    oneuL125c1    oneuL131a1 
-##            40            70             9           120            56 
+##            19            60             8           114            61 
 ##     oneuL1401   oneuL1402.2     oneuL1403   oneuL1404.2     oneuL2181 
-##            46            17             2            59            15 
+##            45            14             5            68             9 
 ##     oneuL2191     oneuL2192     oneuL2201     oneuL2202     oneuL2421 
-##           426            19            15            23            10 
+##           376            17            19            14            13 
 ##     oneuL2422     oneuL2431     oneuL2451     oneuL2461     oneuL3041 
-##             2            59            10            18             4 
+##             3            48            12            12             5 
 ##    oneuL304a1    oneuL304b1     oneuL3081     oneuL3082    oneuL308a1 
-##             3             2             3            34            14 
+##             5             1             0            41            11 
 ##     oneuL3181     oneuL3182   oneuL3301.2    oneuL330a1     oneuL3441 
-##            18            13            18            83            24 
+##            20            15            18            92            26 
 ##     oneuL3461     oneuL3462     oneuLb401 oneuLcontroL1 oneuLcontroL2 
-##           177            12            82          2842          3429 
+##           187            17            83          2842          3425 
 ##    oneuLh2411  oneuLH2412.2  oneuLs2101.2    oneuLs2301    oneuLs2401 
-##            21            13            16           127           524
+##            24             9            21           103           519
 ```
 
 ```r
@@ -1129,7 +1140,7 @@ taxo[shew, ]
 ##                                                                                            genus
 ## Bacteria;Proteobacteria;Gammaproteobacteria;Alteromonadales;Shewanellaceae;Shewanella Shewanella
 ##                                                                                       abundance
-## Bacteria;Proteobacteria;Gammaproteobacteria;Alteromonadales;Shewanellaceae;Shewanella      3650
+## Bacteria;Proteobacteria;Gammaproteobacteria;Alteromonadales;Shewanellaceae;Shewanella      3691
 ```
 
 ```r
@@ -1138,23 +1149,23 @@ ger.10K[, shew] # only #1 and #4 are prevalent in controls
 
 ```
 ##     oneuL1201     oneuL1202  oneuL120a1.2  oneuL120a2.2    oneuL120e1 
-##          1600            13            61             7            14 
+##          1600            16            66             6            13 
 ##     oneuL1251     oneuL1252  oneuL125a1.2    oneuL125c1    oneuL131a1 
-##            13            12             4            46            19 
+##            15            20             1            47            16 
 ##     oneuL1401   oneuL1402.2     oneuL1403   oneuL1404.2     oneuL2181 
-##             8             3             3            18             5 
+##            10             1             2            24             4 
 ##     oneuL2191     oneuL2192     oneuL2201     oneuL2202     oneuL2421 
-##           137             2             3             1             5 
+##           119             3             7             1             7 
 ##     oneuL2422     oneuL2431     oneuL2451     oneuL2461     oneuL3041 
-##             0            22             2             0             1 
+##             0            19             2             0             2 
 ##    oneuL304a1    oneuL304b1     oneuL3081     oneuL3082    oneuL308a1 
-##             1             0             0            10             9 
+##             0             0             0             8             7 
 ##     oneuL3181     oneuL3182   oneuL3301.2    oneuL330a1     oneuL3441 
-##             6             4             2            25             7 
+##             2             7             4            22             4 
 ##     oneuL3461     oneuL3462     oneuLb401 oneuLcontroL1 oneuLcontroL2 
-##            57             3            18           726           653 
+##            76             2            22           735           655 
 ##    oneuLh2411  oneuLH2412.2  oneuLs2101.2    oneuLs2301    oneuLs2401 
-##             4             1             9            19            97
+##             5             4             8            24           105
 ```
 
 ```r
@@ -1266,6 +1277,15 @@ sort(rowSums(ger.nc))
 ##         28724         29669         33307         33447         37455
 ```
 
+```r
+summary(rowSums(ger.nc)) ## post-contaminant filtering
+```
+
+```
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##    3486   20940   23300   22940   25240   37460
+```
+
 Based on the NMDS and read counts, sample 'oneuL1201' is similar to the controls and has far fewer read counts than the rest of the samples. The controls are also well separated from the rest of the samples (i.e. their composition is different). Therefore, we will exclude the two controls and 
 
 ```r
@@ -1280,6 +1300,31 @@ ger.map <- ger.map.all[-which(rownames(ger.map.all) %in% c('oneuL1201', 'oneuLco
 
 ## rarefy
 sort(rowSums(ger.nc)) ## minimum is 16,447
+```
+
+```
+##   oneuL304b1 oneuL120a1.2    oneuL2202    oneuL1252    oneuL3181 
+##        16447        18735        19194        19966        20294 
+##   oneuL131a1   oneuL120e1  oneuL1402.2    oneuL2191    oneuL2181 
+##        20301        20562        20735        20945        21459 
+##    oneuLb401    oneuL2422    oneuL3041  oneuL1404.2    oneuL3081 
+##        21506        21554        21896        21905        22025 
+##   oneuLh2411  oneuL3301.2    oneuL3461   oneuL330a1    oneuL3441 
+##        22445        22634        22815        23086        23304 
+## oneuLH2412.2 oneuL120a2.2    oneuL2192   oneuLs2301    oneuL1403 
+##        23873        24080        24191        24220        24346 
+## oneuL125a1.2    oneuL2421   oneuL125c1   oneuL308a1    oneuL3462 
+##        24521        24589        25061        25123        25224 
+## oneuLs2101.2    oneuL1202    oneuL2461   oneuLs2401    oneuL2201 
+##        25242        25264        26402        26810        26883 
+##    oneuL3082    oneuL1401    oneuL1251    oneuL3182    oneuL2451 
+##        27155        27856        28724        29669        33307 
+##    oneuL2431   oneuL304a1 
+##        33447        37455
+```
+
+```r
+sort(rowSums(ger.nc)) ## after excluding controls, low-count sample
 ```
 
 ```
@@ -1324,14 +1369,14 @@ nmds.bc.nc <- nmds(bc.nc)
 ```
 
 ```
-## initial  value 31.173168 
-## iter   5 value 22.534379
-## iter  10 value 19.745642
-## iter  15 value 19.003369
-## iter  20 value 18.587222
-## iter  25 value 18.236009
-## iter  30 value 18.069951
-## final  value 18.007471 
+## initial  value 31.008434 
+## iter   5 value 22.623490
+## iter  10 value 19.950716
+## iter  15 value 19.560921
+## iter  20 value 18.865422
+## iter  25 value 18.258609
+## iter  30 value 17.948253
+## final  value 17.835614 
 ## converged
 ```
 
@@ -1340,12 +1385,12 @@ nmds.can.nc <- nmds(can.nc)
 ```
 
 ```
-## initial  value 28.153066 
-## iter   5 value 20.177724
-## iter  10 value 17.301944
-## iter  15 value 16.177410
-## iter  20 value 15.865615
-## final  value 15.833275 
+## initial  value 28.058217 
+## iter   5 value 20.223078
+## iter  10 value 18.091583
+## iter  15 value 16.620135
+## iter  20 value 16.204605
+## final  value 16.072496 
 ## converged
 ```
 
@@ -1399,10 +1444,10 @@ adonis(bc.nc ~ ger.map$SpaceTypeBioBE) ## R2 = 0.28471, p = 0.004 **
 ## 
 ## Terms added sequentially (first to last)
 ## 
-##                        Df SumsOfSqs MeanSqs F.Model      R2 Pr(>F)    
-## ger.map$SpaceTypeBioBE  8    2.0897 0.26121  1.6437 0.28493  0.001 ***
-## Residuals              33    5.2443 0.15892         0.71507           
-## Total                  41    7.3340                 1.00000           
+##                        Df SumsOfSqs MeanSqs F.Model      R2 Pr(>F)   
+## ger.map$SpaceTypeBioBE  8    2.0823 0.26029  1.6381 0.28424  0.002 **
+## Residuals              33    5.2435 0.15890         0.71576          
+## Total                  41    7.3258                 1.00000          
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
@@ -1422,9 +1467,9 @@ adonis(can.nc ~ ger.map$SpaceTypeBioBE) ## R2 = 0.22885,  p = 0.006 **
 ## Terms added sequentially (first to last)
 ## 
 ##                        Df SumsOfSqs MeanSqs F.Model      R2 Pr(>F)   
-## ger.map$SpaceTypeBioBE  8    2.4713 0.30891  1.2196 0.22819  0.002 **
-## Residuals              33    8.3589 0.25330         0.77181          
-## Total                  41   10.8302                 1.00000          
+## ger.map$SpaceTypeBioBE  8    2.4502 0.30628  1.2088 0.22664  0.005 **
+## Residuals              33    8.3611 0.25337         0.77336          
+## Total                  41   10.8113                 1.00000          
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
@@ -1438,7 +1483,7 @@ pcoa.bc.rval$values$Rel_corr_eig[1:2]
 ```
 
 ```
-## [1] 0.1850737 0.1148023
+## [1] 0.1845029 0.1157053
 ```
 
 ```r

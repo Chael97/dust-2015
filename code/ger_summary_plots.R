@@ -38,9 +38,10 @@ png('figures/ger_heatmap_top25_genus.png', width = 7, height = 6, res = 300, uni
 par(xpd = TRUE)
 heatmap.2(t(ger.nc.prop[,pick]), trace = 'none',
           col = colorRampPalette(brewer.pal(9, 'YlGnBu'))(100), margin = c(6,10),
-          ColSideColors = mycol,
+          ColSideColors = mycol, revC = TRUE,
           density.info = 'none', 
-          keysize = 1, key.title = '', key.xlab = 'Proportion',
+          keysize = 0.9, key.title = '', key.xlab = 'Proportion',
+          breaks = seq(0, 1, 0.01),
           labCol = ger.map[row.names(ger.nc.prop), 'Description'],
           labRow = consensus.nc[colnames(ger.nc.prop[,pick])],
           xlab = 'Sample', ylab = 'Taxon')
@@ -75,7 +76,7 @@ theme_set(theme_bw())
 gg.pcoa.bc.nc <- ggplot(df.pcoa.bc.nc.all, aes(x = PCoA1, y = PCoA2, color = SpaceTypeBioBE))
 gg.pcoa.bc.nc + geom_point(size = 3) +
   # ggtitle('PCoA on Bray-Curtis') +
-  geom_text(aes(y = PCoA2 + 0.01, label = Description), size = 3, vjust = 0) + 
+  # geom_text(aes(y = PCoA2 + 0.01, label = Description), size = 3, vjust = 0) + 
   scale_color_manual(values = mycol.9, name = 'Space Type',
                      breaks = c('building.support', 'circulation', 'classroom', 'gym', 'laundry', 
                                 'lockers', 'office', 'pool', 'restroom'))
@@ -92,10 +93,11 @@ df.nmds.bc.nc.all <- merge(df.nmds.bc.nc, ger.map)
 gg.nmds.bc.nc <- ggplot(df.nmds.bc.nc.all, aes(x = NMDS1, y = NMDS2, color = SpaceTypeBioBE))
 gg.nmds.bc.nc + geom_point(size = 3) +
   # ggtitle('NMDS on Bray-Curtis') +
-  geom_text(aes(y = NMDS2 + 0.01, label = Description), size = 3, vjust = 0) + 
+  # geom_text(aes(y = NMDS2 + 0.01, label = Description), size = 3, vjust = 0) + 
   scale_color_manual(values = mycol.9, name = 'Space Type',
                      breaks = c('building.support', 'circulation', 'classroom', 'gym', 'laundry', 
-                                'lockers', 'office', 'pool', 'restroom'))
+                                'lockers', 'office', 'pool', 'restroom')) +
+  theme(panel.grid.minor = element_blank())
 ggsave('figures/nmds_bc_g_sampletype.png', width = 8, height = 6.5, units = 'in')
 
 ####################################
@@ -110,7 +112,8 @@ gg.pcoa.bc.nc +
   scale_size_continuous(range = c(3,8), name = 'Crack Area') +
   scale_color_manual(values = mycol.9, name = 'Space Type',
                      breaks = c('building.support', 'circulation', 'classroom', 'gym', 'laundry', 
-                                'lockers', 'office', 'pool', 'restroom'))
+                                'lockers', 'office', 'pool', 'restroom')) +
+  theme(panel.grid.minor = element_blank())
 ggsave('figures/pcoa_bc_g_crackarea.png', width = 8, height = 6.5, units = 'in')
 
 ## chem = TCSavg  
@@ -123,7 +126,8 @@ gg.pcoa.bc.nc +
   scale_color_manual(values = mycol.9, name = 'Space Type',
                      breaks = c('building.support', 'circulation', 'classroom', 'gym', 'laundry', 
                                 'lockers', 'office', 'pool', 'restroom')) +
-  scale_size_continuous(range = c(3,8), name = 'Triclosan')
+  scale_size_continuous(range = c(3,8), name = 'Triclosan') +
+  theme(panel.grid.minor = element_blank())
 ggsave('figures/pcoa_bc_g_TCSavg.png', width = 8, height = 6.5, units = 'in')
 
 ## chem = TCCavg  
@@ -136,7 +140,8 @@ gg.pcoa.bc.nc +
   scale_color_manual(values = mycol.9, name = 'Space Type',
                      breaks = c('building.support', 'circulation', 'classroom', 'gym', 'laundry', 
                                 'lockers', 'office', 'pool', 'restroom')) +
-  scale_size_continuous(range = c(3,8), name = 'Triclocarban')
+  scale_size_continuous(range = c(3,8), name = 'Triclocarban') +
+  theme(panel.grid.minor = element_blank())
 ggsave('figures/pcoa_bc_g_TCCavg.png', width = 8, height = 6.5, units = 'in')
 
 ## chem = MePBavg  
@@ -149,7 +154,8 @@ gg.pcoa.bc.nc +
   scale_color_manual(values = mycol.9, name = 'Space Type',
                      breaks = c('building.support', 'circulation', 'classroom', 'gym', 'laundry', 
                                 'lockers', 'office', 'pool', 'restroom')) +
-  scale_size_continuous(range = c(3,8), name = 'Methylparaben')
+  scale_size_continuous(range = c(3,8), name = 'Methylparaben') +
+  theme(panel.grid.minor = element_blank())
 ggsave('figures/pcoa_bc_g_MePBavg.png', width = 8, height = 6.5, units = 'in')
 
 ## chem = EtPBavg  
@@ -162,7 +168,8 @@ gg.pcoa.bc.nc +
   scale_color_manual(values = mycol.9, name = 'Space Type',
                      breaks = c('building.support', 'circulation', 'classroom', 'gym', 'laundry', 
                                 'lockers', 'office', 'pool', 'restroom')) +
-  scale_size_continuous(range = c(3,8), name = 'Ethylparaben')
+  scale_size_continuous(range = c(3,8), name = 'Ethylparaben') +
+  theme(panel.grid.minor = element_blank())
 ggsave('figures/pcoa_bc_g_EtPBavg.png', width = 8, height = 6.5, units = 'in')
 
 ## chem = PrPBavg  
@@ -175,7 +182,8 @@ gg.pcoa.bc.nc +
   scale_color_manual(values = mycol.9, name = 'Space Type',
                      breaks = c('building.support', 'circulation', 'classroom', 'gym', 'laundry', 
                                 'lockers', 'office', 'pool', 'restroom')) +
-  scale_size_continuous(range = c(3,8), name = 'Propylparaben')
+  scale_size_continuous(range = c(3,8), name = 'Propylparaben') +
+  theme(panel.grid.minor = element_blank())
 ggsave('figures/pcoa_bc_g_PrPBavg.png', width = 8, height = 6.5, units = 'in')
 
 ## chem = BuBPavg  
@@ -188,7 +196,8 @@ gg.pcoa.bc.nc +
   scale_color_manual(values = mycol.9, name = 'Space Type',
                      breaks = c('building.support', 'circulation', 'classroom', 'gym', 'laundry', 
                                 'lockers', 'office', 'pool', 'restroom')) +
-  scale_size_continuous(range = c(3,8), name = 'Butylparaben')
+  scale_size_continuous(range = c(3,8), name = 'Butylparaben') +
+  theme(panel.grid.minor = element_blank())
 ggsave('figures/pcoa_bc_g_BuPBavg.png', width = 8, height = 6.5, units = 'in')
 
 ####################################
@@ -205,10 +214,12 @@ theme_set(theme_bw())
 gg.pcoa.can.nc <- ggplot(df.pcoa.can.nc.all, aes(x = PCoA1, y = PCoA2, color = SpaceTypeBioBE))
 gg.pcoa.can.nc + geom_point(size = 3) +
   # ggtitle('PCoA on Canberra') +
-  geom_text(aes(y = PCoA2 + 0.01, label = Description), size = 3, vjust = 0) + 
+  # geom_text(aes(y = PCoA2 + 0.01, label = Description), size = 3, vjust = 0) + 
   scale_color_manual(values = mycol.9, name = 'Space Type',
                      breaks = c('building.support', 'circulation', 'classroom', 'gym', 'laundry', 
-                                'lockers', 'office', 'pool', 'restroom'))
+                                'lockers', 'office', 'pool', 'restroom')) +
+  theme(panel.grid.minor = element_blank()) +
+  theme(panel.grid.minor = element_blank())
 ggsave('figures/pcoa_can_g_sampletype.png', width = 8, height = 6.5, units = 'in')
 
 ####################################
@@ -222,10 +233,11 @@ df.nmds.can.nc.all <- merge(df.nmds.can.nc, ger.map)
 gg.nmds.can.nc <- ggplot(df.nmds.can.nc.all, aes(x = NMDS1, y = NMDS2, color = SpaceTypeBioBE))
 gg.nmds.can.nc + geom_point(size = 3) +
   # ggtitle('NMDS on Canberra') +
-  geom_text(aes(y = NMDS2 + 0.01, label = Description), size = 3, vjust = 0) + 
+  # geom_text(aes(y = NMDS2 + 0.01, label = Description), size = 3, vjust = 0) + 
   scale_color_manual(values = mycol.9, name = 'Space Type',
                      breaks = c('building.support', 'circulation', 'classroom', 'gym', 'laundry', 
-                                'lockers', 'office', 'pool', 'restroom'))
+                                'lockers', 'office', 'pool', 'restroom')) +
+  theme(panel.grid.minor = element_blank())
 ggsave('figures/nmds_can_g_sampletype.png', width = 8, height = 6.5, units = 'in')
 
 ####################################
@@ -240,7 +252,8 @@ gg.pcoa.can.nc +
   scale_size_continuous(range = c(3,8), name = 'Crack Area') +
   scale_color_manual(values = mycol.9, name = 'Space Type',
                      breaks = c('building.support', 'circulation', 'classroom', 'gym', 'laundry', 
-                                'lockers', 'office', 'pool', 'restroom'))
+                                'lockers', 'office', 'pool', 'restroom')) +
+  theme(panel.grid.minor = element_blank())
 ggsave('figures/pcoa_can_g_crackarea.png', width = 8, height = 6.5, units = 'in')
 
 ## chem = TCSavg  
@@ -253,7 +266,8 @@ gg.pcoa.can.nc +
   scale_color_manual(values = mycol.9, name = 'Space Type',
                      breaks = c('building.support', 'circulation', 'classroom', 'gym', 'laundry', 
                                 'lockers', 'office', 'pool', 'restroom')) +
-  scale_size_continuous(range = c(3,8), name = 'Triclosan')
+  scale_size_continuous(range = c(3,8), name = 'Triclosan') +
+  theme(panel.grid.minor = element_blank())
 ggsave('figures/pcoa_can_g_TCSavg.png', width = 8, height = 6.5, units = 'in')
 
 ## chem = TCCavg  
@@ -266,7 +280,8 @@ gg.pcoa.can.nc +
   scale_color_manual(values = mycol.9, name = 'Space Type',
                      breaks = c('building.support', 'circulation', 'classroom', 'gym', 'laundry', 
                                 'lockers', 'office', 'pool', 'restroom')) +
-  scale_size_continuous(range = c(3,8), name = 'Triclocarban')
+  scale_size_continuous(range = c(3,8), name = 'Triclocarban') +
+  theme(panel.grid.minor = element_blank())
 ggsave('figures/pcoa_can_g_TCCavg.png', width = 8, height = 6.5, units = 'in')
 
 ## chem = MePBavg  
@@ -279,7 +294,8 @@ gg.pcoa.can.nc +
   scale_color_manual(values = mycol.9, name = 'Space Type',
                      breaks = c('building.support', 'circulation', 'classroom', 'gym', 'laundry', 
                                 'lockers', 'office', 'pool', 'restroom')) +
-  scale_size_continuous(range = c(3,8), name = 'Methylparaben')
+  scale_size_continuous(range = c(3,8), name = 'Methylparaben') +
+  theme(panel.grid.minor = element_blank())
 ggsave('figures/pcoa_can_g_MePBavg.png', width = 8, height = 6.5, units = 'in')
 
 ## chem = EtPBavg  
@@ -292,7 +308,8 @@ gg.pcoa.can.nc +
   scale_color_manual(values = mycol.9, name = 'Space Type',
                      breaks = c('building.support', 'circulation', 'classroom', 'gym', 'laundry', 
                                 'lockers', 'office', 'pool', 'restroom')) +
-  scale_size_continuous(range = c(3,8), name = 'Ethylparaben')
+  scale_size_continuous(range = c(3,8), name = 'Ethylparaben') +
+  theme(panel.grid.minor = element_blank())
 ggsave('figures/pcoa_can_g_EtPBavg.png', width = 8, height = 6.5, units = 'in')
 
 ## chem = PrPBavg  
@@ -305,7 +322,8 @@ gg.pcoa.can.nc +
   scale_color_manual(values = mycol.9, name = 'Space Type',
                      breaks = c('building.support', 'circulation', 'classroom', 'gym', 'laundry', 
                                 'lockers', 'office', 'pool', 'restroom')) +
-  scale_size_continuous(range = c(3,8), name = 'Propylparaben')
+  scale_size_continuous(range = c(3,8), name = 'Propylparaben') +
+  theme(panel.grid.minor = element_blank())
 ggsave('figures/pcoa_can_g_PrPBavg.png', width = 8, height = 6.5, units = 'in')
 
 ## chem = BuBPavg  
@@ -318,5 +336,6 @@ gg.pcoa.can.nc +
   scale_color_manual(values = mycol.9, name = 'Space Type',
                      breaks = c('building.support', 'circulation', 'classroom', 'gym', 'laundry', 
                                 'lockers', 'office', 'pool', 'restroom')) +
-  scale_size_continuous(range = c(3,8), name = 'Butylparaben')
+  scale_size_continuous(range = c(3,8), name = 'Butylparaben') +
+  theme(panel.grid.minor = element_blank())
 ggsave('figures/pcoa_can_g_BuPBavg.png', width = 8, height = 6.5, units = 'in')
