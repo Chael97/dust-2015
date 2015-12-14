@@ -23,8 +23,13 @@ map.out <- read.table('results/sourcetracker_out/ger_wood_barberan_genus/map.txt
 ger.map$Env <- gsub('.', ' ', ger.map$SpaceType, fixed = TRUE)
 map.out$SpaceTypeBioBE <- ger.map$SpaceTypeBioBE[match(map.out$Env, ger.map$Env)]
 
+## exclude controls and sample 1201 (low read count)
+sample.ignore <- c('oneuL1201', 'oneuLcontroL1', 'oneuLcontroL2')
+map.out.orig <- map.out
+map.out <- map.out.orig[!(rownames(map.out.orig) %in% sample.ignore),]
+
 ## note control samples
-control.id <- rownames(map.out)[grep('oneuLcontroL', rownames(map.out))]
+# control.id <- rownames(map.out)[grep('oneuLcontroL', rownames(map.out))]
 
 ## reduce maps to source/sink proportions
 prop.pick <- c('Env', 'SpaceTypeBioBE', 'TITLE', 'Proportion_Human.Feces', 'Proportion_Human.Mouth', 'Proportion_Human.Skin', 
@@ -36,22 +41,20 @@ res.prop$SampleID <- rownames(res.prop)
 ## melt dataframe for barplots
 res.prop.lg <- melt(res.prop, id.vars = c('SampleID', 'Env', 'SpaceTypeBioBE', 'TITLE'))
 
-## narrow selection to Gerlinger only
+## narrow selection to present study only
 res.prop.lg.ger <- subset(res.prop.lg, TITLE == 'Gerlinger')
 sample.pick.ger <- rownames(map.out)[grep('oneuL', rownames(map.out))]
 
 ## note control samples
-control.id <- rownames(map.out)[grep('oneuLcontroL', rownames(map.out))]
+# control.id <- rownames(map.out)[grep('oneuLcontroL', rownames(map.out))]
 
 ## set sample order for plots
-# ord.id <- c(rownames(map.out)[order(map.out$Env)][rownames(map.out)[order(map.out$Env)] %in% sample.pick.ger[!(sample.pick.ger %in% control.id)]],
-            # control.id)
-# ord.env <- c(as.character(map.out$Env[order(map.out$Env)][rownames(map.out)[order(map.out$Env)] %in% sample.pick.ger[!(sample.pick.ger %in% control.id)]]),
-             # rep('control', 2))
-ord.id <- c(rownames(map.out)[order(map.out$SpaceTypeBioBE)][rownames(map.out)[order(map.out$SpaceTypeBioBE)] %in% sample.pick.ger[!(sample.pick.ger %in% control.id)]],
-            control.id)
-ord.env <- c(as.character(map.out$SpaceTypeBioBE[order(map.out$SpaceTypeBioBE)][rownames(map.out)[order(map.out$SpaceTypeBioBE)] %in% sample.pick.ger[!(sample.pick.ger %in% control.id)]]),
-             rep('control', 2))
+# ord.id <- c(rownames(map.out)[order(map.out$SpaceTypeBioBE)][rownames(map.out)[order(map.out$SpaceTypeBioBE)] %in% sample.pick.ger[!(sample.pick.ger %in% control.id)]],
+#             control.id)
+# ord.env <- c(as.character(map.out$SpaceTypeBioBE[order(map.out$SpaceTypeBioBE)][rownames(map.out)[order(map.out$SpaceTypeBioBE)] %in% sample.pick.ger[!(sample.pick.ger %in% control.id)]]),
+#              rep('control', 2))
+ord.id <- rownames(map.out)[order(map.out$SpaceTypeBioBE)][rownames(map.out)[order(map.out$SpaceTypeBioBE)] %in% sample.pick.ger]
+ord.env <- as.character(map.out$SpaceTypeBioBE[order(map.out$SpaceTypeBioBE)][rownames(map.out)[order(map.out$SpaceTypeBioBE)] %in% sample.pick.ger])
 
 ## bar plot of Gerlinger-only sourcetracker results
 gg.prop.bar <- ggplot(res.prop.lg.ger, aes(x = SampleID, y = value, fill = variable))
