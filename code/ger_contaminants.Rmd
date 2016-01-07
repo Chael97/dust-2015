@@ -412,6 +412,7 @@ ger.map <- ger.map.all[-which(rownames(ger.map.all) %in% c('oneuL1201', 'oneuLco
 ## rarefy
 sort(rowSums(ger.nc)) ## minimum is 16,447
 sort(rowSums(ger.nc)) ## after excluding controls, low-count sample
+summary(rowSums(ger.nc))
 
 ger.nc.rare <- rrarefy(ger.nc, 16000)
 ger.nc.rare <- ger.nc.rare[, -which(colSums(ger.nc.rare) == 0)]
