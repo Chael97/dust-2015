@@ -30,11 +30,13 @@ ger.nc.prop <- prop.table(ger.nc, margin = 1)
 ## subset to top 25 taxa
 # pick <- order(apply(ger.nc.prop, 2, median), decreasing=TRUE)[1:25]
 pick <- order(colSums(ger.nc.prop), decreasing=TRUE)[1:25]
+# pick <- order(colSums(ger.nc.prop), decreasing=TRUE)[1:10]
 
 identical(row.names(ger.nc.prop), row.names(ger.map))
 mycol <- mycol.9[match(ger.map$SpaceTypeBioBE, names(mycol.9))]
 
 png('figures/ger_heatmap_top25_genus.png', width = 7, height = 6, res = 300, units = 'in', pointsize = 8)
+# png('figures/ger_heatmap_top10_genus.png', width = 12, height = 8, res = 300, units = 'in', pointsize = 14)
 par(xpd = TRUE)
 heatmap.2(t(ger.nc.prop[,pick]), trace = 'none',
           col = colorRampPalette(brewer.pal(9, 'YlGnBu'))(100), margin = c(6,10),
@@ -45,7 +47,8 @@ heatmap.2(t(ger.nc.prop[,pick]), trace = 'none',
           labCol = ger.map[row.names(ger.nc.prop), 'Description'],
           labRow = consensus.nc[colnames(ger.nc.prop[,pick])],
           xlab = 'Sample', ylab = 'Taxon')
-legend(0.9, 1.1, bty = 'n', cex = 0.7, title = 'Space Type',
+          # xlab = '', ylab = '')
+legend(0.9, 1.15, bty = 'n', cex = 0.7, title = 'Space Type',
        legend = c('building.support', 'circulation', 'classroom', 'gym', 'laundry', 
                   'lockers', 'office', 'pool', 'restroom'),
        fill = mycol.9, border = 'white')

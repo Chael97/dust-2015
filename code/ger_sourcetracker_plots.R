@@ -1,6 +1,6 @@
 ## Summarize Gerlinger SourceTracker results
 ## Roxana Hickey <roxana.hickey@gmail.com
-## Laste updated 2015-12-09
+## Last updated 2015-12-09
 
 setwd('~/Documents/projects/gerlinger/')
 library(ggplot2)
