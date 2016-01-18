@@ -2,7 +2,7 @@
 ## Last updated 2015-12-09
 ## Roxana Hickey <roxana.hickey@gmail.com>
 
-setwd('~/Documents/projects/gerlinger/')
+setwd('~/Documents/projects/dust_2015/')
 library(ggplot2)
 library(RColorBrewer)
 library(vegan)

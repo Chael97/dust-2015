@@ -1,8 +1,8 @@
-## Summarize Gerlinger SourceTracker results
+## Summarize SourceTracker results
 ## Roxana Hickey <roxana.hickey@gmail.com
 ## Last updated 2015-12-09
 
-setwd('~/Documents/projects/gerlinger/')
+setwd('~/Documents/projects/dust_2015/')
 library(ggplot2)
 library(reshape)
 library(RColorBrewer)
@@ -42,7 +42,7 @@ res.prop$SampleID <- rownames(res.prop)
 res.prop.lg <- melt(res.prop, id.vars = c('SampleID', 'Env', 'SpaceTypeBioBE', 'TITLE'))
 
 ## narrow selection to present study only
-res.prop.lg.ger <- subset(res.prop.lg, TITLE == 'Gerlinger')
+res.prop.lg.ger <- subset(res.prop.lg, TITLE == 'University mixed-use facility')
 sample.pick.ger <- rownames(map.out)[grep('oneuL', rownames(map.out))]
 
 ## note control samples
@@ -56,7 +56,7 @@ sample.pick.ger <- rownames(map.out)[grep('oneuL', rownames(map.out))]
 ord.id <- rownames(map.out)[order(map.out$SpaceTypeBioBE)][rownames(map.out)[order(map.out$SpaceTypeBioBE)] %in% sample.pick.ger]
 ord.env <- as.character(map.out$SpaceTypeBioBE[order(map.out$SpaceTypeBioBE)][rownames(map.out)[order(map.out$SpaceTypeBioBE)] %in% sample.pick.ger])
 
-## bar plot of Gerlinger-only sourcetracker results
+## bar plot of sourcetracker results (present study only)
 gg.prop.bar <- ggplot(res.prop.lg.ger, aes(x = SampleID, y = value, fill = variable))
 gg.prop.bar + geom_bar(stat = 'identity') +
   # scale_fill_manual(values = c(brewer.pal(11, 'Spectral')[c(11,10,9,8,7)], 
@@ -91,14 +91,14 @@ gg.prop.2.vio + geom_violin(adjust = 0.75, alpha = 0.3) +
   geom_boxplot(width = 0.1, aes(fill = TITLE), color = 'black', outlier.color = NA) +
   stat_summary(fun.y = median, geom = 'point', fill = 'white', shape = 21, size = 2.5) +
   scale_fill_manual(values = c('darkmagenta', '#FF3300', '#FF9500'),
-                    limits = c('Gerlinger',                                                               
+                    limits = c('University mixed-use facility',                                                               
                                'Athletic equipment microbiota are shaped by interactions with human skin',
                                'The ecology of microscopic life in household dust')) +
   scale_color_manual(values = c('darkmagenta', '#FF3300', '#FF9500'),
-                    limits = c('Gerlinger',                                                               
+                    limits = c('University mixed-use facility',                                                               
                                'Athletic equipment microbiota are shaped by interactions with human skin',
                                'The ecology of microscopic life in household dust')) +
-  scale_x_discrete(limits = c('Gerlinger',                                                               
+  scale_x_discrete(limits = c('University mixed-use facility',                                                               
                               'Athletic equipment microbiota are shaped by interactions with human skin',
                               'The ecology of microscopic life in household dust'), 
                    labels = c('Present Study',
@@ -113,17 +113,17 @@ ggsave('figures/ger_wood_barberan_sourcetracker_genus_violin.png', width = 8, he
 # gg.prop.2.box <- ggplot(res.prop.2, aes(x = TITLE, y = Proportion_Human, fill = TITLE))
 # gg.prop.2.box + geom_boxplot(show_guide = FALSE) + 
 #   scale_fill_manual(values = c('darkmagenta', '#FFD701', 'turquoise'),
-#                     limits = c('Gerlinger',                                                               
+#                     limits = c('University mixed-use facility',                                                               
 #                                'Athletic equipment microbiota are shaped by interactions with human skin',
 #                                'The ecology of microscopic life in household dust'), 
-#                     labels = c('Gerlinger',
+#                     labels = c('University mixed-use facility',
 #                                'Athletic Facilities',
 #                                'Homes'),
 #                     name = 'Study') +
-#   scale_x_discrete(limits = c('Gerlinger',                                                               
+#   scale_x_discrete(limits = c('University mixed-use facility',                                                               
 #                               'Athletic equipment microbiota are shaped by interactions with human skin',
 #                               'The ecology of microscopic life in household dust'), 
-#                    labels = c('Gerlinger',
+#                    labels = c('Present Study',
 #                               'Athletic Facilities',
 #                               'Homes')) +
 #   xlab('Study') +
@@ -136,10 +136,10 @@ ggsave('figures/ger_wood_barberan_sourcetracker_genus_violin.png', width = 8, he
 # gg.prop.2.hist + geom_density(alpha = 0.6, adjust = 0.75) +
 #   # geom_line(stat = 'density', adjust = 0.75) +
 #   scale_fill_manual(values = c('darkmagenta', '#FFD701', 'turquoise'),
-#                     limits = c('Gerlinger',                                                               
+#                     limits = c('University mixed-use facility',                                                               
 #                                'Athletic equipment microbiota are shaped by interactions with human skin',
 #                                'The ecology of microscopic life in household dust'), 
-#                     labels = c('Gerlinger',
+#                     labels = c('Present Study',
 #                                'Athletic Facilities',
 #                                'Homes'),
 #                     name = 'Study') +

@@ -1,6 +1,6 @@
 2015-11-30 RH
 
-Three files copied from: /Users/rhickey/Dropbox (BioBE)/BioBE Team Folder/Gerlinger/metagenome analysis/shortbred/ardb figure
+Three files copied from: /Users/rhickey/Dropbox (BioBE)/BioBE Team Folder/dust_2015/metagenome analysis/shortbred/ardb figure
 
 - ARDB_Data_comparison.xlsx: data from meta-analysis by Tiffany Hsu (Huttenhower lab); this includes 3 datasets (HMP subjects, time point 1; Yatsunenko et al.; Qin et al.). Email message from Tiffany Hsu on 11/11/15:
 	“Figure S3 is a combination of Jim's Shortbred paper data, a PLoS One paper (Yooseph et al. 2013), and the MBTA data.
@@ -13,4 +13,4 @@ The processed table is under Supplemental Tables, Table S8, Tab 3, ARDB_DataComp
 
 - categories_metadata.txt: source categories for all samples
 
-- gerlinger_shortbred_merged_ardb.txt: antibiotic resistance database (ARDB) ShortBred results from Gerlinger samples (performed by EH)
+- ger_shortbred_merged_ardb.txt: antibiotic resistance database (ARDB) ShortBred results (performed by EH)
