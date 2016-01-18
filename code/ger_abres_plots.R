@@ -71,7 +71,7 @@ all.ardb.sum <- colSums(all.ardb)
 all.cat$AbRes_RPKM <- all.ardb.sum[match(names(all.ardb.sum), all.cat$SampleID)]
 
 ## set theme_bw
-theme_set(theme_bw())
+theme_set(theme_bw(base_size = 16))
 
 ## violin plot of 3 studies
 gg.ardb.vio <- ggplot(all.cat, aes(x = Env, y = AbRes_RPKM, color = Env, fill = Env))

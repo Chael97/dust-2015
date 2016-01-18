@@ -12,7 +12,6 @@ library(phyloseq)
 library(gplots)
 
 ## load OTU table and map file from post-contaminant filtering
-# load('results/otu_setup/ger_otu_setup.RData')
 load('results/otu_setup/ger_rm_contaminants.RData')
 
 ## Helpful reminders: 
@@ -35,7 +34,7 @@ pick <- order(colSums(ger.nc.prop), decreasing=TRUE)[1:25]
 identical(row.names(ger.nc.prop), row.names(ger.map))
 mycol <- mycol.9[match(ger.map$SpaceTypeBioBE, names(mycol.9))]
 
-png('figures/ger_heatmap_top25_genus.png', width = 7, height = 6, res = 300, units = 'in', pointsize = 8)
+png('figures/ger_heatmap_top25_genus.png', width = 7, height = 6, res = 300, units = 'in', pointsize = 10)
 # png('figures/ger_heatmap_top10_genus.png', width = 12, height = 8, res = 300, units = 'in', pointsize = 14)
 par(xpd = TRUE)
 heatmap.2(t(ger.nc.prop[,pick]), trace = 'none',
@@ -54,17 +53,6 @@ legend(0.9, 1.15, bty = 'n', cex = 0.7, title = 'Space Type',
        fill = mycol.9, border = 'white')
 dev.off()
 
-# png('figures/ger_heatmap_top25_genus_v2.png', width = 7, height = 6, res = 300, units = 'in', pointsize = 8)
-# heatmap.2(t(ger.nc.prop[,pick]), trace = 'none',
-#           col = colorRampPalette(brewer.pal(9, 'YlGnBu'))(100), margin = c(6,10),
-#           # ColSideColors = mycol,
-#           density.info = 'none', 
-#           keysize = 1, key.title = '', key.xlab = 'Proportion',
-#           labCol = ger.map[row.names(ger.nc.prop), 'Description'],
-#           labRow = consensus.nc[colnames(ger.nc.prop[,pick])],
-#           xlab = 'Sample', ylab = 'Taxon')
-# dev.off()
-
 ####################################
 ## plot Bray-Curtis PCoA
 df.pcoa.bc.nc <- as.data.frame(pcoa.bc.nc$points)
@@ -72,8 +60,13 @@ colnames(df.pcoa.bc.nc) <- c('PCoA1', 'PCoA2')
 df.pcoa.bc.nc$SampleID <- rownames(df.pcoa.bc.nc)
 df.pcoa.bc.nc.all <- merge(df.pcoa.bc.nc, ger.map)
 
+## view percent explained by each PCO
+eigenvals(pcoa.bc.nc)/sum(eigenvals(pcoa.bc.nc))
+r2.pcoa.bc.nc.1 <- round(eigenvals(pcoa.bc.nc)[1]/sum(eigenvals(pcoa.bc.nc)) * 100, 1)
+r2.pcoa.bc.nc.2 <- round(eigenvals(pcoa.bc.nc)[2]/sum(eigenvals(pcoa.bc.nc)) * 100, 1)
+
 ## set theme_bw
-theme_set(theme_bw())
+theme_set(theme_bw(base_size = 14))
 
 ## all samples by space type
 gg.pcoa.bc.nc <- ggplot(df.pcoa.bc.nc.all, aes(x = PCoA1, y = PCoA2, color = SpaceTypeBioBE))
@@ -82,7 +75,10 @@ gg.pcoa.bc.nc + geom_point(size = 3) +
   # geom_text(aes(y = PCoA2 + 0.01, label = Description), size = 3, vjust = 0) + 
   scale_color_manual(values = mycol.9, name = 'Space Type',
                      breaks = c('building.support', 'circulation', 'classroom', 'gym', 'laundry', 
-                                'lockers', 'office', 'pool', 'restroom'))
+                                'lockers', 'office', 'pool', 'restroom')) +
+  xlab(paste0('PCoA 1 (', r2.pcoa.bc.nc.1, '%)')) +
+  ylab(paste0('PCoA 2 (', r2.pcoa.bc.nc.2, '%)')) +
+  theme(panel.grid.minor = element_blank())
 ggsave('figures/pcoa_bc_g_sampletype.png', width = 8, height = 6.5, units = 'in')
 
 ####################################
@@ -116,6 +112,8 @@ gg.pcoa.bc.nc +
   scale_color_manual(values = mycol.9, name = 'Space Type',
                      breaks = c('building.support', 'circulation', 'classroom', 'gym', 'laundry', 
                                 'lockers', 'office', 'pool', 'restroom')) +
+  xlab(paste0('PCoA 1 (', r2.pcoa.bc.nc.1, '%)')) +
+  ylab(paste0('PCoA 2 (', r2.pcoa.bc.nc.2, '%)')) +
   theme(panel.grid.minor = element_blank())
 ggsave('figures/pcoa_bc_g_crackarea.png', width = 8, height = 6.5, units = 'in')
 
@@ -129,7 +127,9 @@ gg.pcoa.bc.nc +
   scale_color_manual(values = mycol.9, name = 'Space Type',
                      breaks = c('building.support', 'circulation', 'classroom', 'gym', 'laundry', 
                                 'lockers', 'office', 'pool', 'restroom')) +
-  scale_size_continuous(range = c(3,8), name = 'Triclosan') +
+  scale_size_continuous(range = c(3,8), name = 'Triclosan') +  
+  xlab(paste0('PCoA 1 (', r2.pcoa.bc.nc.1, '%)')) +
+  ylab(paste0('PCoA 2 (', r2.pcoa.bc.nc.2, '%)')) +
   theme(panel.grid.minor = element_blank())
 ggsave('figures/pcoa_bc_g_TCSavg.png', width = 8, height = 6.5, units = 'in')
 
@@ -144,6 +144,8 @@ gg.pcoa.bc.nc +
                      breaks = c('building.support', 'circulation', 'classroom', 'gym', 'laundry', 
                                 'lockers', 'office', 'pool', 'restroom')) +
   scale_size_continuous(range = c(3,8), name = 'Triclocarban') +
+  xlab(paste0('PCoA 1 (', r2.pcoa.bc.nc.1, '%)')) +
+  ylab(paste0('PCoA 2 (', r2.pcoa.bc.nc.2, '%)')) +
   theme(panel.grid.minor = element_blank())
 ggsave('figures/pcoa_bc_g_TCCavg.png', width = 8, height = 6.5, units = 'in')
 
@@ -158,6 +160,8 @@ gg.pcoa.bc.nc +
                      breaks = c('building.support', 'circulation', 'classroom', 'gym', 'laundry', 
                                 'lockers', 'office', 'pool', 'restroom')) +
   scale_size_continuous(range = c(3,8), name = 'Methylparaben') +
+  xlab(paste0('PCoA 1 (', r2.pcoa.bc.nc.1, '%)')) +
+  ylab(paste0('PCoA 2 (', r2.pcoa.bc.nc.2, '%)')) +
   theme(panel.grid.minor = element_blank())
 ggsave('figures/pcoa_bc_g_MePBavg.png', width = 8, height = 6.5, units = 'in')
 
@@ -172,6 +176,8 @@ gg.pcoa.bc.nc +
                      breaks = c('building.support', 'circulation', 'classroom', 'gym', 'laundry', 
                                 'lockers', 'office', 'pool', 'restroom')) +
   scale_size_continuous(range = c(3,8), name = 'Ethylparaben') +
+  xlab(paste0('PCoA 1 (', r2.pcoa.bc.nc.1, '%)')) +
+  ylab(paste0('PCoA 2 (', r2.pcoa.bc.nc.2, '%)')) +
   theme(panel.grid.minor = element_blank())
 ggsave('figures/pcoa_bc_g_EtPBavg.png', width = 8, height = 6.5, units = 'in')
 
@@ -186,6 +192,8 @@ gg.pcoa.bc.nc +
                      breaks = c('building.support', 'circulation', 'classroom', 'gym', 'laundry', 
                                 'lockers', 'office', 'pool', 'restroom')) +
   scale_size_continuous(range = c(3,8), name = 'Propylparaben') +
+  xlab(paste0('PCoA 1 (', r2.pcoa.bc.nc.1, '%)')) +
+  ylab(paste0('PCoA 2 (', r2.pcoa.bc.nc.2, '%)')) +
   theme(panel.grid.minor = element_blank())
 ggsave('figures/pcoa_bc_g_PrPBavg.png', width = 8, height = 6.5, units = 'in')
 
@@ -200,6 +208,8 @@ gg.pcoa.bc.nc +
                      breaks = c('building.support', 'circulation', 'classroom', 'gym', 'laundry', 
                                 'lockers', 'office', 'pool', 'restroom')) +
   scale_size_continuous(range = c(3,8), name = 'Butylparaben') +
+  xlab(paste0('PCoA 1 (', r2.pcoa.bc.nc.1, '%)')) +
+  ylab(paste0('PCoA 2 (', r2.pcoa.bc.nc.2, '%)')) +
   theme(panel.grid.minor = element_blank())
 ggsave('figures/pcoa_bc_g_BuPBavg.png', width = 8, height = 6.5, units = 'in')
 
@@ -210,8 +220,10 @@ colnames(df.pcoa.can.nc) <- c('PCoA1', 'PCoA2')
 df.pcoa.can.nc$SampleID <- rownames(df.pcoa.can.nc)
 df.pcoa.can.nc.all <- merge(df.pcoa.can.nc, ger.map)
 
-## set theme_bw
-theme_set(theme_bw())
+## view percent explained by each PCO
+eigenvals(pcoa.can.nc)/sum(eigenvals(pcoa.can.nc))
+r2.pcoa.can.nc.1 <- round(eigenvals(pcoa.can.nc)[1]/sum(eigenvals(pcoa.can.nc)) * 100, 1)
+r2.pcoa.can.nc.2 <- round(eigenvals(pcoa.can.nc)[2]/sum(eigenvals(pcoa.can.nc)) * 100, 1)
 
 ## all samples by space type
 gg.pcoa.can.nc <- ggplot(df.pcoa.can.nc.all, aes(x = PCoA1, y = PCoA2, color = SpaceTypeBioBE))
@@ -221,7 +233,8 @@ gg.pcoa.can.nc + geom_point(size = 3) +
   scale_color_manual(values = mycol.9, name = 'Space Type',
                      breaks = c('building.support', 'circulation', 'classroom', 'gym', 'laundry', 
                                 'lockers', 'office', 'pool', 'restroom')) +
-  theme(panel.grid.minor = element_blank()) +
+  xlab(paste0('PCoA 1 (', r2.pcoa.can.nc.1, '%)')) +
+  ylab(paste0('PCoA 2 (', r2.pcoa.can.nc.2, '%)')) +
   theme(panel.grid.minor = element_blank())
 ggsave('figures/pcoa_can_g_sampletype.png', width = 8, height = 6.5, units = 'in')
 
@@ -256,6 +269,8 @@ gg.pcoa.can.nc +
   scale_color_manual(values = mycol.9, name = 'Space Type',
                      breaks = c('building.support', 'circulation', 'classroom', 'gym', 'laundry', 
                                 'lockers', 'office', 'pool', 'restroom')) +
+  xlab(paste0('PCoA 1 (', r2.pcoa.can.nc.1, '%)')) +
+  ylab(paste0('PCoA 2 (', r2.pcoa.can.nc.2, '%)')) +
   theme(panel.grid.minor = element_blank())
 ggsave('figures/pcoa_can_g_crackarea.png', width = 8, height = 6.5, units = 'in')
 
@@ -270,6 +285,8 @@ gg.pcoa.can.nc +
                      breaks = c('building.support', 'circulation', 'classroom', 'gym', 'laundry', 
                                 'lockers', 'office', 'pool', 'restroom')) +
   scale_size_continuous(range = c(3,8), name = 'Triclosan') +
+  xlab(paste0('PCoA 1 (', r2.pcoa.can.nc.1, '%)')) +
+  ylab(paste0('PCoA 2 (', r2.pcoa.can.nc.2, '%)')) +
   theme(panel.grid.minor = element_blank())
 ggsave('figures/pcoa_can_g_TCSavg.png', width = 8, height = 6.5, units = 'in')
 
@@ -284,6 +301,8 @@ gg.pcoa.can.nc +
                      breaks = c('building.support', 'circulation', 'classroom', 'gym', 'laundry', 
                                 'lockers', 'office', 'pool', 'restroom')) +
   scale_size_continuous(range = c(3,8), name = 'Triclocarban') +
+  xlab(paste0('PCoA 1 (', r2.pcoa.can.nc.1, '%)')) +
+  ylab(paste0('PCoA 2 (', r2.pcoa.can.nc.2, '%)')) +
   theme(panel.grid.minor = element_blank())
 ggsave('figures/pcoa_can_g_TCCavg.png', width = 8, height = 6.5, units = 'in')
 
@@ -298,6 +317,8 @@ gg.pcoa.can.nc +
                      breaks = c('building.support', 'circulation', 'classroom', 'gym', 'laundry', 
                                 'lockers', 'office', 'pool', 'restroom')) +
   scale_size_continuous(range = c(3,8), name = 'Methylparaben') +
+  xlab(paste0('PCoA 1 (', r2.pcoa.can.nc.1, '%)')) +
+  ylab(paste0('PCoA 2 (', r2.pcoa.can.nc.2, '%)')) +
   theme(panel.grid.minor = element_blank())
 ggsave('figures/pcoa_can_g_MePBavg.png', width = 8, height = 6.5, units = 'in')
 
@@ -312,6 +333,8 @@ gg.pcoa.can.nc +
                      breaks = c('building.support', 'circulation', 'classroom', 'gym', 'laundry', 
                                 'lockers', 'office', 'pool', 'restroom')) +
   scale_size_continuous(range = c(3,8), name = 'Ethylparaben') +
+  xlab(paste0('PCoA 1 (', r2.pcoa.can.nc.1, '%)')) +
+  ylab(paste0('PCoA 2 (', r2.pcoa.can.nc.2, '%)')) +
   theme(panel.grid.minor = element_blank())
 ggsave('figures/pcoa_can_g_EtPBavg.png', width = 8, height = 6.5, units = 'in')
 
@@ -326,6 +349,8 @@ gg.pcoa.can.nc +
                      breaks = c('building.support', 'circulation', 'classroom', 'gym', 'laundry', 
                                 'lockers', 'office', 'pool', 'restroom')) +
   scale_size_continuous(range = c(3,8), name = 'Propylparaben') +
+  xlab(paste0('PCoA 1 (', r2.pcoa.can.nc.1, '%)')) +
+  ylab(paste0('PCoA 2 (', r2.pcoa.can.nc.2, '%)')) +
   theme(panel.grid.minor = element_blank())
 ggsave('figures/pcoa_can_g_PrPBavg.png', width = 8, height = 6.5, units = 'in')
 
@@ -340,5 +365,7 @@ gg.pcoa.can.nc +
                      breaks = c('building.support', 'circulation', 'classroom', 'gym', 'laundry', 
                                 'lockers', 'office', 'pool', 'restroom')) +
   scale_size_continuous(range = c(3,8), name = 'Butylparaben') +
+  xlab(paste0('PCoA 1 (', r2.pcoa.can.nc.1, '%)')) +
+  ylab(paste0('PCoA 2 (', r2.pcoa.can.nc.2, '%)')) +
   theme(panel.grid.minor = element_blank())
 ggsave('figures/pcoa_can_g_BuPBavg.png', width = 8, height = 6.5, units = 'in')

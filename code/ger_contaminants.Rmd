@@ -219,7 +219,7 @@ sam.cum.10 <- cumsum(rev(sample.taxa.10))
 Big panel figure showing each top contaminant in the dataset and its influence on first axis of NMDS or PCoA:
 ```{r fig.width = 10, fig.height = 12}
 ## NMDS
-# pdf('~/Documents/projects/dust_2015/figures/contaminationTop10_nmds_bc.pdf', height=10, width=10, useDingbats=TRUE)
+pdf('~/Documents/projects/dust_2015/figures/contaminationTop10_nmds_bc.pdf', height=10, width=10, useDingbats=TRUE)
 layout(matrix(c(11:15, 1:10, 16:20), 5, 4), 
        heights = c(1, 1, 1, 1, 1.5), 
        widths = c(1, 2, 2, 1))
@@ -273,10 +273,10 @@ for (i in 1:10) {
     # mtext(paste(consensus[id], " (", id, ")", sep = ""), line = -1.5)
     mtext(consensus[id], line = -1.5)
 }
-# dev.off()
+dev.off()
 
 ## PCoA
-# pdf('~/Documents/projects/dust_2015/figures/contaminationTop10_pcoa_bc.pdf', height=10, width=10, useDingbats=TRUE)
+pdf('~/Documents/projects/dust_2015/figures/contaminationTop10_pcoa_bc.pdf', height=10, width=10, useDingbats=TRUE)
 layout(matrix(c(11:15, 1:10, 16:20), 5, 4), 
        heights = c(1, 1, 1, 1, 1.5), 
        widths = c(1, 2, 2, 1))
@@ -330,7 +330,7 @@ for (i in 1:10) {
     # mtext(paste(consensus[id], " (", id, ")", sep = ""), line = -1.5)
     mtext(consensus[id], line = -1.5)
 }
-# dev.off()
+dev.off()
 ```
 
 Halomonas and Shewanella are both abundant in the controls and also in one sample. This could be skewing the first PCoA/NMDS axis, so we'll remove those as probably contaminants. Exigubacterium is somewhat abundant in the controls but not in any samples, so we can safely ignore it. Other taxa are present in low abundance in controls and higher abundance in samples (e.g. Enterobacteriaceae), so those are likely not contaminants. Therefore, we will remove Halomonadaceae and Shewanella as likely contaminants but leave all other taxa intact.
