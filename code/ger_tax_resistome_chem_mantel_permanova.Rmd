@@ -11,7 +11,7 @@ output:
 ```{r}
 library(vegan)
 
-setwd('~/Documents/projects/gerlinger/')
+setwd('~/Documents/projects/dust_2015/')
 load('results/otu_setup/ger_rm_contaminants.RData')
 load('results/ger_abres_extra_plots.RData')
 ```
@@ -338,5 +338,5 @@ mantel(vegdist(ger.nc.rare.matchcard, method = 'canberra'),
 ```
 
 ```{r}
-save.image('~/Documents/projects/gerlinger/results/ger_tax_resistome_chem_mantel_permanova.Rmd')
+save.image('~/Documents/projects/dust_2015/results/ger_tax_resistome_chem_mantel_permanova.RData')
 ```

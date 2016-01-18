@@ -15,12 +15,12 @@ library(vegan)
 library(labdsv)
 library(RColorBrewer)
 
-source('~/Documents/projects/gerlinger/code/meadow_pb_functions.R')
+source('~/Documents/projects/dust_2015/code/meadow_pb_functions.R')
 ```
 
 ```{r}
 ## read in the genus-level OTU table
-ger <- read.table('~/Documents/projects/gerlinger/data/tax_16S_uparse/count_tables/gerlinger_uparse_merged_taxonomy_summaries/gerlinger_uparse_merged_L6.txt',
+ger <- read.table('~/Documents/projects/dust_2015/data/tax_16S_uparse/count_tables/ger_uparse_merged_taxonomy_summaries/ger_uparse_merged_L6.txt',
                     header = TRUE, sep = '\t', row.names = 1, comment.char = '', skip = 1)
 ger <- t(ger)
 
@@ -34,7 +34,7 @@ colnames(ger) <- gsub('g__', '', colnames(ger))
 ger.tax <- colnames(ger)
 
 ## read in mapping file with metadata
-ger.map.orig <- read.table('~/Documents/projects/gerlinger/data/map_files/151125_map_edit_finalchems_crack_plus.txt',
+ger.map.orig <- read.table('~/Documents/projects/dust_2015/data/map_files/151125_map_edit_finalchems_crack_plus.txt',
                            header = TRUE, sep = '\t', row.names = 1, comment.char = '')
 ger.map.orig$SampleID <- row.names(ger.map.orig)
 
@@ -219,7 +219,7 @@ sam.cum.10 <- cumsum(rev(sample.taxa.10))
 Big panel figure showing each top contaminant in the dataset and its influence on first axis of NMDS or PCoA:
 ```{r fig.width = 10, fig.height = 12}
 ## NMDS
-# pdf('~/Documents/projects/gerlinger/figures/contaminationTop10_nmds_bc.pdf', height=10, width=10, useDingbats=TRUE)
+# pdf('~/Documents/projects/dust_2015/figures/contaminationTop10_nmds_bc.pdf', height=10, width=10, useDingbats=TRUE)
 layout(matrix(c(11:15, 1:10, 16:20), 5, 4), 
        heights = c(1, 1, 1, 1, 1.5), 
        widths = c(1, 2, 2, 1))
@@ -276,7 +276,7 @@ for (i in 1:10) {
 # dev.off()
 
 ## PCoA
-# pdf('~/Documents/projects/gerlinger/figures/contaminationTop10_pcoa_bc.pdf', height=10, width=10, useDingbats=TRUE)
+# pdf('~/Documents/projects/dust_2015/figures/contaminationTop10_pcoa_bc.pdf', height=10, width=10, useDingbats=TRUE)
 layout(matrix(c(11:15, 1:10, 16:20), 5, 4), 
        heights = c(1, 1, 1, 1, 1.5), 
        widths = c(1, 2, 2, 1))
@@ -482,5 +482,5 @@ Clean up, save data
 ```{r}
 rm(ger.10K.ra, ger.10K, top.10, can, con.cum.10, control.taxa.10, halo, haloCol, shew, shewCol, i, mito, nmds.can, 
   plants, sam.cum.10, sample.ignore, sample.taxa.10, spaces.counts)
-save.image('~/Documents/projects/gerlinger/results/otu_setup/ger_rm_contaminants.RData')
+save.image('~/Documents/projects/dust_2015/results/otu_setup/ger_rm_contaminants.RData')
 ```

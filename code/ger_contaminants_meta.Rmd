@@ -1,5 +1,5 @@
 ---
-title: "Look for contamination in Gerlinger metagenomics MetaPhlAn data"
+title: "Look for contamination in metagenomics MetaPhlAn data"
 author: "Roxana Hickey"
 date: "Last updated December 9, 2015"
 output: 
@@ -16,13 +16,13 @@ library(labdsv)
 library(RColorBrewer)
 library(gplots)
 
-source('~/Documents/projects/gerlinger/code/meadow_pb_functions.R')
+source('~/Documents/projects/dust_2015/code/meadow_pb_functions.R')
 ```
 
 Read in the OTU table (relative abundance)
 ```{r}
 ## read in the genus-level OTU table
-ger.meta <- read.table('~/Documents/projects/gerlinger/data/tax_shotgun_metaphlan/AAGAGGCA-AGAGGATA_S4cat_R1_001.fastq.metaphlan2_merged_meta_L6.txt', header = T, sep = '\t', row.names = 1)
+ger.meta <- read.table('~/Documents/projects/dust_2015/data/tax_shotgun_metaphlan/AAGAGGCA-AGAGGATA_S4cat_R1_001.fastq.metaphlan2_merged_meta_L6.txt', header = T, sep = '\t', row.names = 1)
 ger.meta <- t(ger.meta)
 
 colnames(ger.meta) <- gsub('k__', '', colnames(ger.meta))
@@ -36,7 +36,7 @@ colnames(ger.meta) <- gsub('Other', '', colnames(ger.meta))
 ger.meta.tax <- colnames(ger.meta)
 
 ## read in master sample ID key
-sid.key <- read.table('~/Documents/projects/gerlinger/data/sampleid_master_key.txt',
+sid.key <- read.table('~/Documents/projects/dust_2015/data/sampleid_master_key.txt',
                       sep = '\t', header = T, row.names = NULL)
 rownames(ger.meta) %in% sid.key$metaphlan_barcode
 
@@ -45,7 +45,7 @@ ger.meta.orig <- ger.meta
 rownames(ger.meta) <- sid.key$uparse_sampleid[match(rownames(ger.meta.orig), sid.key$metaphlan_barcode)]
 
 ## read in mapping file with metadata
-ger.map.orig <- read.table('~/Documents/projects/gerlinger/data/map_files/151125_map_edit_finalchems_crack_plus.txt',
+ger.map.orig <- read.table('~/Documents/projects/dust_2015/data/map_files/151125_map_edit_finalchems_crack_plus.txt',
                            header = TRUE, sep = '\t', row.names = 1, comment.char = '')
 ger.map.orig$SampleID <- row.names(ger.map.orig)
 
@@ -276,7 +276,7 @@ pick <- order(colSums(ger.meta), decreasing=TRUE)[1:25]
 identical(row.names(ger.meta), row.names(ger.meta.map))
 mycol <- mycol.10[match(ger.meta.map$SpaceTypeBioBE, names(mycol.10))]
 
-# png('~/Documents/projects/gerlinger/figures/ger_meta_heatmap_top25_genus_withPropi.png', width = 7, height = 6, res = 300, units = 'in', pointsize = 8)
+# png('~/Documents/projects/dust_2015/figures/ger_meta_heatmap_top25_genus_withPropi.png', width = 7, height = 6, res = 300, units = 'in', pointsize = 8)
 par(xpd = TRUE)
 heatmap.2(t(ger.meta[,pick]), trace = 'none',
           col = colorRampPalette(brewer.pal(9, 'YlGnBu'))(100), margin = c(6,10),
@@ -299,7 +299,7 @@ pick <- order(colSums(ger.meta.nc), decreasing=TRUE)[1:25]
 identical(row.names(ger.meta.nc), row.names(ger.meta.map.nc))
 mycol <- mycol.10[match(ger.meta.map.nc$SpaceTypeBioBE, names(mycol.10))]
 
-# png('~/Documents/projects/gerlinger/figures/ger_meta_heatmap_top25_genus_noPropi.png', width = 7, height = 6, res = 300, units = 'in', pointsize = 8)
+# png('~/Documents/projects/dust_2015/figures/ger_meta_heatmap_top25_genus_noPropi.png', width = 7, height = 6, res = 300, units = 'in', pointsize = 8)
 par(xpd = TRUE)
 heatmap.2(t(ger.meta.nc[,pick]), trace = 'none',
           col = colorRampPalette(brewer.pal(9, 'YlGnBu'))(100), margin = c(6,10),
@@ -331,5 +331,5 @@ mycol.9 <- mycol.10[-10]
 Clean up, save data
 ```{r}
 rm(top.10, can.meta, con.cum.10, control.taxa.10, i, nmds.can.meta, sam.cum.10, sample.taxa.10, spaces.counts)
-save.image('~/Documents/projects/gerlinger/results/otu_setup/ger_rm_contaminants_meta.RData')
+save.image('~/Documents/projects/dust_2015/results/otu_setup/ger_rm_contaminants_meta.RData')
 ```
