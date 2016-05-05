@@ -202,4 +202,60 @@ colnames(ger.card) <- sid.key$uparse_sampleid[match(colnames(ger.card), sid.key$
 ## remove duplicate samples
 ger.card <- ger.card[, colnames(ger.card) %in% rownames(ger.meta)]
 
+####################################
+## read in new CARD data and gene ID key (late April 2016)
+ger.card.new <- read.table('data/shortbred_card/160503_abr_CARDv105_merged_labeled.txt',
+                           sep = '\t', header = T, row.names = 1)
+colnames(ger.card.new) <- gsub("X_", "_", colnames(ger.card.new))
+
+card.new.id.key <- read.table('data/shortbred_card/160504_abr_clusters.txt', 
+                              sep = '\t', header = T)
+
+## list of CARD IDs present in 2+ samples
+# card.id.2plus <- readLines('data/shortbred_card/160503_card_abr_in_2plus.txt')
+card.new.id.2plus <- rownames(ger.card.new)[rowSums(ger.card.new != 0) >= 2]
+
+## remove zero-sum samples (no sequence data)
+ger.card.new <- ger.card.new[ , colSums(ger.card.new) > 0]
+
+## check if all CARD IDs in cluster key
+card.new.id.2plus %in% card.new.id.key$id
+
+## check if all samples in master sample ID key
+colnames(ger.card.new) %in% sid.key$metaphlan_id2
+colnames(ger.card.new)[!(colnames(ger.card.new) %in% sid.key$metaphlan_id2)]
+
+## remove 'undetermined' sample
+# ger.card.new[,'Undetermined'] <- NULL
+# colnames(ger.card.new) %in% sid.key$metaphlan_barcode
+
+## replace sample IDs to match 16S data
+colnames(ger.card.new) <- sid.key$uparse_sampleid[match(colnames(ger.card.new), sid.key$metaphlan_id2)]
+
+## remove duplicate samples
+ger.card.new <- ger.card.new[, colnames(ger.card.new) %in% rownames(ger.meta)]
+
+## reduce to CARD IDs in 2+ samples
+ger.card.new.2plus <- as.data.frame(t(ger.card.new[(rownames(ger.card.new) %in% card.new.id.2plus),]))
+
+ger.card.new.2plus$SampleID <- rownames(ger.card.new.2plus)
+ger.card.new.2plus.lg <- melt(ger.card.new.2plus, id.vars = 'SampleID')
+colnames(ger.card.new.2plus.lg) <- c('SampleID', 'CARD_ID', 'RPKM')
+
+## add more informative CARD cluster names
+ger.card.new.2plus.lg$CARD_cluster <- card.new.id.key$cluster[match(ger.card.new.2plus.lg$CARD_ID, card.new.id.key$id)]
+
+## plot wrt CARD cluster
+gg.card.ger.dot.c <- ggplot(ger.card.new.2plus.lg, aes(x = CARD_cluster, y = RPKM))
+gg.card.ger.dot.c + geom_jitter(alpha = 0.5, color = 'darkmagenta', shape = 16, 
+                                position = position_jitter(width = 0.2),
+                                aes(order = rev(seq(1, nrow(ger.card.new.2plus.lg))))) +
+  xlab('Antibiotic Resistance Gene Classification') +
+  ylab('Gene relative abundance (RPKM)') +
+  scale_x_discrete(limits = sort(unique(ger.card.new.2plus.lg$CARD_cluster), decreasing = T)) +
+  coord_flip() +
+  theme_bw()
+  # theme(axis.text.x = element_text(angle = 90, hjust = 1))
+ggsave('figures/ger_card_new_dot.png', width = 8, height = 6)
+
 save.image('~/Documents/projects/dust_2015/results/ger_shortbred_abres_plots.RData')

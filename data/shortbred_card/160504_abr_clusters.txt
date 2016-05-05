@@ -1,0 +1,50 @@
+id	cluster
+gi|66864118|ARO_3000753|abeM__Acinetobacter_baumannii_	MATE Antibiotic Efflux
+gi|152814|ARO_3002549|AAC(6_)-Ic__Serratia_marcescens_	Aminoglycoside Acetyltransferase
+gi|295164|ARO_3002542|AAC(3)-VIIIa__Streptomyces_fradiae_	Aminoglycoside Acetyltransferase
+gi|440200|ARO_3002528|AAC(3)-Ia__Cloning_vector_pUCGM_	Aminoglycoside Acetyltransferase
+gi|444893738|ARO_3002525|AAC(2_)-Ic__Mycobacterium_tuberculosis_H37Rv_	Aminoglycoside Acetyltransferase
+gi|565411207|ARO_3003199|AAC(6_)-Iak__Stenotrophomonas_maltophilia_	Aminoglycoside Acetyltransferase
+gi|38259411|ARO_3002641|APH(3_)-Ia__Serratia_marcescens_	Aminoglycoside Phosphotransferase
+gi|27315582|ARO_3002865|dfrC__Staphylococcus_epidermidis_ATCC_12228_	Antibiotic Target
+gi|4103867|ARO_3002867|dfrF__Enterococcus_faecalis_	Antibiotic Target
+gi|70609066|ARO_3002711|QnrA5__Shewanella_algae_	Antibiotic Target
+gi|81343248|ARO_3003020|dfrA25__Salmonella_enterica_subsp__enterica_serovar_Agona_	Antibiotic Target
+gi|161508254|ARO_3000621|PC1_beta-lactamase_(blaZ)__Staphylococcus_aureus_subsp__aureus_USA300_TCH959_	Class A Beta-Lactamase
+gi|239925271|ARO_3002320|KPC-10__Acinetobacter_baumannii_	Class A Beta-Lactamase
+gi|254966746|ARO_3003097|CfxA6__uncultured_organism_	Class A Beta-Lactamase
+gi|7381165|ARO_3002244|CARB-5__Acinetobacter_calcoaceticus_subsp__anitratus_	Class A Beta-Lactamase
+gi|197296820|ARO_3002482|LRA-1__uncultured_bacterium_BLR1_	Class B Beta-Lactamase
+gi|2575872|ARO_3002493|SRT-1__Serratia_marcescens_	Class C Beta-Lactamase
+gi|4218927|ARO_3001417|OXA-22__Ralstonia_pickettii_	Class D Beta-Lactamase
+gi|15830993|ARO_3000676|H-NS__Escherichia_coli_O157_H7_str__Sakai_	Gene Modulating Antibiotic Efflux
+gi|15834091|ARO_3000830|cpxA__Escherichia_coli_O157_H7_str__Sakai_	Gene Modulating Antibiotic Efflux
+gi|169633903|ARO_3000814|mexT__Acinetobacter_baumannii_SDF_	Gene Modulating Antibiotic Efflux
+gi|269202307|ARO_3000815|mgrA__Staphylococcus_aureus_subsp__aureus_ED98_	Gene Modulating Antibiotic Efflux
+gi|81242205|ARO_3000516|emrR__Shigella_dysenteriae_Sd197_	Gene Modulating Antibiotic Efflux
+gi|85676683|ARO_3000518|CRP__Escherichia_coli_str__K-12_substr__W3110_	Gene Modulating Antibiotic Efflux
+gi|220901858|ARO_3002911|vanM__Enterococcus_faecium_	Glycopeptide Resistance
+gi|557879507|ARO_3002930|vanRO__Rhodococcus_equi_	Glycopeptide Resistance
+gi|239796048|ARO_3000198|FosX__Desulfovibrio_magneticus_RS-1_	Inactivation Enzyme
+gi|114425697|ARO_3002835|lnuA__Staphylococcus_chromogenes_	Lincosamide Resistance
+gi|1835597|ARO_3002701|cmr__Corynebacterium_glutamicum_	MFS Antibiotic Efflux
+gi|262225770|ARO_3000178|tetK__Staphylococcus_aureus_subsp__aureus_ED98_	MFS Antibiotic Efflux
+gi|33090253|ARO_3000569|tet41__Serratia_marcescens_	MFS Antibiotic Efflux
+gi|47160|ARO_3002690|cml__Streptomyces_lividans_1326_	MFS Antibiotic Efflux
+gi|571046708|ARO_3000615|mefA__Exiguobacterium_sp__S3-2_	MFS Antibiotic Efflux
+gi|9945806|ARO_3002703|cmx__Corynebacterium_striatum_	MFS Antibiotic Efflux
+gi|1230606|ARO_3000375|ErmB__Lactobacillus_fermentum_	rRNA Methyltransferase
+gi|150831|ARO_3000250|ErmC__Staphylococcus_epidermidis_	rRNA Methyltransferase
+gi|18390036|ARO_3000605|Erm(36)__Micrococcus_luteus_	rRNA Methyltransferase
+gi|34328034|ARO_3000599|Erm(33)__Staphylococcus_sciuri_	rRNA Methyltransferase
+gi|40437|ARO_3000596|ErmX__Corynebacterium_diphtheriae_	rRNA Methyltransferase
+gi|111608744|ARO_3002830|vgaALC__Staphylococcus_haemolyticus_	Streptogramin Resistance
+gi|225861764|ARO_3000616|mel__Streptococcus_pneumoniae_Taiwan19F-14_	Streptogramin Resistance
+gi|110611192|ARO_3000216|acrB__Enterobacter_cloacae_	Subunit of Efflux Pump
+gi|11071585|ARO_3003057|smeF__Stenotrophomonas_maltophilia_	Subunit of Efflux Pump
+gi|15597215|ARO_3002982|amrA__Pseudomonas_aeruginosa_PAO1_	Subunit of Efflux Pump
+gi|298103888|ARO_3003046|qacA__Staphylococcus_aureus_	Subunit of Efflux Pump
+gi|AAG07064_1|ARO_3003693|mexK__Pseudomonas_aeruginosa_PAO1_	Subunit of Efflux Pump
+gi|144215|ARO_3000190|tetO__Campylobacter_jejuni_	Tetracycline Other
+gi|168259002|ARO_3000194|tetW__Bifidobacterium_longum_	Tetracycline Other
+gi|394759|ARO_3000191|tetQ__Bacteroides_fragilis_	Tetracycline Other

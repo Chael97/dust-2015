@@ -1,5 +1,5 @@
 ## Perform exploratory ecological analysis on taxonomic data
-## Last updated 2015-12-09
+## Last updated 2016-05-03
 ## Roxana Hickey <roxana.hickey@gmail.com>
 
 setwd('~/Documents/projects/dust_2015/')
@@ -37,14 +37,17 @@ mycol <- mycol.9[match(ger.map$SpaceTypeBioBE, names(mycol.9))]
 png('figures/ger_heatmap_top25_genus.png', width = 7, height = 6, res = 300, units = 'in', pointsize = 10)
 # png('figures/ger_heatmap_top10_genus.png', width = 12, height = 8, res = 300, units = 'in', pointsize = 14)
 par(xpd = TRUE)
-heatmap.2(t(ger.nc.prop[,pick]), trace = 'none',
+heatmap.2(t(ger.nc.prop[,rev(pick)]), trace = 'none',
           col = colorRampPalette(brewer.pal(9, 'YlGnBu'))(100), margin = c(6,10),
           ColSideColors = mycol, revC = TRUE,
+          Rowv = FALSE,
           density.info = 'none', 
           keysize = 0.9, key.title = '', key.xlab = 'Proportion',
           breaks = seq(0, 1, 0.01),
           labCol = ger.map[row.names(ger.nc.prop), 'Description'],
-          labRow = consensus.nc[colnames(ger.nc.prop[,pick])],
+          labRow = consensus.nc[colnames(ger.nc.prop[,rev(pick)])],
+          cexRow = 0.3 + 1/log10(nrow(ger.nc.prop)),
+          cexCol = 0.3 + 1/log10(nrow(ger.nc.prop)),
           xlab = 'Sample', ylab = 'Taxon')
           # xlab = '', ylab = '')
 legend(0.9, 1.15, bty = 'n', cex = 0.7, title = 'Space Type',
