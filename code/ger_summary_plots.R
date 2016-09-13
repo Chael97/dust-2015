@@ -38,7 +38,8 @@ png('figures/ger_heatmap_top25_genus.png', width = 7, height = 6, res = 300, uni
 # png('figures/ger_heatmap_top10_genus.png', width = 12, height = 8, res = 300, units = 'in', pointsize = 14)
 par(xpd = TRUE)
 heatmap.2(t(ger.nc.prop[,rev(pick)]), trace = 'none',
-          col = colorRampPalette(brewer.pal(9, 'YlGnBu'))(100), margin = c(6,10),
+          # col = colorRampPalette(brewer.pal(9, 'YlGnBu'))(100), margin = c(6,10),
+          col = colorRampPalette(brewer.pal(9, 'PuRd')[-1])(100), margin = c(6,10),
           ColSideColors = mycol, revC = TRUE,
           Rowv = FALSE,
           density.info = 'none', 
